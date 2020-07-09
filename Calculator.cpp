@@ -1,6 +1,7 @@
 #include "Calculator.h"
 
-#include <iostream>
+
+// Calculates the dot product of two vectors v1 and v2
 
 int Calculator::dot_product(std::vector<int>& v1, std::vector<int>& v2)
 {

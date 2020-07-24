@@ -1,0 +1,32 @@
+<!DOCTYPE HTML>
+<html>
+	<h1>Vector Calculator</h1>
+
+	{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+	<form action="{% url 'vector_api' %}" method="GET">
+		<p>Vector 1</p><br>
+		<label for="x1">x:</label>
+		<input type="number" name="x1"><br><br>
+		<label for="y1">y:</label>
+		<input type="number" name="y1"><br><br>
+	<!--	<label for="z1">z:</label>
+	<input type="number" name="z1"><br><br><br> -->
+		<p>Vector 2</p><br>
+		<label for="x2">x:</label>
+		<input type="number" name="x2"><br><br>
+		<label for="y2">y:</label>
+		<input type="number" name="y2"><br><br>
+	<!--	<label for="z2">z:</label>
+		<input type="number" name="z2"><br><br>
+	-->
+
+
+		<input type="submit" value="Submit">
+	<form>
+	
+		{% if x1 != "" %}
+		<p1>Answer is</p1>
+		{% endif %}
+	
+</html>

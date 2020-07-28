@@ -16,30 +16,37 @@ std::ostream& operator << (std::ostream& output, std::vector<int> v)
     return output;
 };
 
+// handles vector inputs (when "-v" is used)
 std::vector<std::vector<int>> vector_handler(int argc, char* argv[])
 {
     std::string x;
     std::vector<int> v1, v2;
-    int a;
+    int a; 
         
+    	// put each component of vector 1 into vector v1
         for (int i=4; i < argc; i++)
         {
             x = argv[i];
+	    // collecting each component until the indicator for vector 2 appears
             if (x.compare("-v2") != 0)
             {
-                v1.push_back(std::stoi(x));
+		// type case integer and add component to vector
+                v1.push_back(std::stof(x));
             } else 
             {
+		// a is the index of "-v2"
                 a = i;
                 break;
             }
         }
         
-        for (int i=a+1; i < argc; i++)
+	// put each component of vector 2 into vector v2
+	for (int i=a+1; i < argc; i++)
         {
-            x = argv[i];
+		
+		x = argv[i];
 
-            v2.push_back(std::stoi(x));
+		v2.push_back(std::stof(x));
         }
     
 //         for (int i=0; i < v1.size(); i++)
@@ -62,6 +69,7 @@ int main(int argc, char* argv[])
 
     std::string x = argv[1];
     
+    // checking for "-v", which indicates vector operation
     if (x.compare("-v") == 0)
     {
         std::vector<std::vector<int>> vectors = vector_handler(argc, argv);

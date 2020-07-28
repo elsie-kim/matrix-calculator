@@ -11,7 +11,7 @@ class Calculator
 {
     public:
         std::vector<std::string> operations = {"dot_product"};
-        int dot_product(std::vector<int>& v, std::vector<int>& v2);
+        float dot_product(std::vector<int>& v, std::vector<int>& v2);
         
         
 

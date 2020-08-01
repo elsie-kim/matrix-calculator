@@ -26,7 +26,7 @@ def vector(request):
 
     return render(request, 'calculator/vector.html', context)
 
-def validate(request):
+def validate_vector(request):
     # cleans up user input and determines if the user's input is useable
     def validate_vector(v):
         # removing any white space at the beginning
@@ -41,7 +41,7 @@ def validate(request):
         
         # return empty list to indicate empty input
         if v == "":
-            return [""]
+            return ""
 
         elif v[0] == '(' and v[-1] == ')':
             # remove parentheses
@@ -49,7 +49,7 @@ def validate(request):
            
             # remove spaces
             v_split = v_split.split(' ')
-            v_split_2 = []
+            v_split_2 = "" 
             
             # remove commas and any non-numerical characters
             for i in v_split:
@@ -59,41 +59,41 @@ def validate(request):
                     try:
                         # finding non-numerical characters
                         j = int(j)
-                        
-                        # add to new vector which holds the "cleaned" input
-                        v_split_2.append(j)
-                        
+        
+                        # add to new string which holds the "cleaned" input
+                        v_split_2 += str(j) + " "
+                
                     except:
                         pass
-            # return list of components            
+            # return list of components
             return v_split_2 
 
         else:
             pass
             # return empty list to indicate that the user's input is not useable
-            return [""]
+            return ""
     
     # response to AJAX call sent by pressing "Enter"
-    try:
+    try: #try/except necessary?
         # getting user's inputs from "Vector 1" and "Vector 2"
         v1 = request.GET['v1']
         v2 = request.GET['v2']
         operation = request.GET['operation']
  
         # receive "cleaned" or empty list
-        v1_comp = validate_vector(v1)
-        v2_comp = validate_vector(v2)
+        v1_clean = validate_vector(v1)
+        v2_clean = validate_vector(v2)
         
         # validate user input
-        if v1_comp[0] != "" and v2_comp[0] != "" and len(v1_comp) == len(v2_comp):
+        if v1_clean != "" and v2_clean != "" and len(v1_clean.split(" ")) == len(v2_clean.split(" ")):
             is_valid = 1
         else:
             is_valid = 0
         
         data = {
-            'is_valid' : str(is_valid),
-            'v1_clean' : str(v1_comp),
-            'v2_clean' : str(v2_comp),
+            'is_valid': str(is_valid),
+            'v1_clean': v1_clean,
+            'v2_clean': v2_clean,
             'operation' : str(operation),
         }
 
@@ -103,7 +103,37 @@ def validate(request):
     # send back for AJAX to handle
     return JsonResponse(data)
 
+def calculate_vector(request):
+    v1 = request.GET['v1']
+    v2 = request.GET['v2']
+    operation = request.GET['operation']
+    
+    input_cmd = ['./a.out', '-v', operation, '-v1']
 
+    def format_input(v1, v2):
+        v1 = v1.split(" ")
+        v2 = v2.split(" ")
+
+        for i in v1: # fit into one loop?
+            if i != "":
+                input_cmd.append(i)
+        
+        input_cmd.append("-v2")
+
+        for i in v2:
+            if i != "":
+                input_cmd.append(i)
+
+    
+    os.chdir("/home/elsie/calculator/matrix-calculator/calc-c++/")
+    format_input(v1, v2)
+    answer =str(float(subprocess.check_output(input_cmd))) # change to int if int, float if float
+
+    data = {
+        'answer': answer
+    }
+
+    return JsonResponse(data)
 
 
 

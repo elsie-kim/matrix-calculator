@@ -8,7 +8,7 @@
 		</form>
 		
 		<body>
-			<p id="message">Hi</p>
+			<p id="message"></p>
 		</body>
 		
 		<script type="text/javascript">
@@ -30,7 +30,7 @@
 						},
 						dataType: 'json',
 						success: function(data){
-							handleValidationResult(data.is_valid, data.v1_comp, data.v2_comp, data.operation);
+							handleValidationResult(data.is_valid, data.v1_clean, data.v2_clean, data.operation);
 
 						}
 					});
@@ -41,15 +41,29 @@
 			/* 
 			** passes data sent back by Django views.py to be handled 
 			** is_valid: "0" or "1" to indicate if user should be prompted to re-enter their input]
-			** v1_comp and v2_comp: "cleaned" version of user input (e.g. removing white space)
+			** v1 and v2: "cleaned" version of user input (e.g. removing white space)
 			*/
 			function handleValidationResult(is_valid, v1, v2, operation) {
 				// checks if user's input was deemed valid by validate() in Django views.py
-				if (is_valid == "1") {
-					alert("Valid Input");
+				if (is_valid == "1") {			
 					//send ajax request to vector() in views
+					$.ajax({
+						type: 'GET',
+						url: '/vector/calculate/',
+						data: {
+							'v1': v1,
+							'v2': v2,
+							'operation': operation
+						},
+						dataType: 'json',
+						success: function(data){
+							// display answer
+							document.getElementById("message").innerHTML = "Answer: " + data.answer;
+						}
+					});
+
 				} else {
-					alert("Invalid Input");
+					alert("Invalid Input"); // change to display message instead of alert
 				}
 
 			}

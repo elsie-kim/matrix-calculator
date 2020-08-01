@@ -12,37 +12,45 @@
 		</body>
 		
 		<script type="text/javascript">
+			// listens for "Enter" button
 			document.getElementById("vector-submit").addEventListener("click", vectorInput);
 
 			function vectorInput(e) {
 				$(document).on('submit', '#vector', function(e){
 					e.preventDefault();
-
+					// sends a 'GET' request to validate the user's input
 					$.ajax({
 						type: 'GET',
 						url: '/vector/validate/',
 						data: {  
 							'v1': document.getElementById('id_vector1').value,
 							'v2': document.getElementById('id_vector2').value,
+							'operation': document.getElementById('id_operation').value,
 							csrfmiddlewaretoken: '{{ csrf_token }}'
 						},
 						dataType: 'json',
 						success: function(data){
-							console.log(data.is_valid);
+							handleValidationResult(data.is_valid, data.v1_comp, data.v2_comp, data.operation);
 
 						}
 					});
 				});
 						
 			}
-
-			function handleValidationResult() {
-				//if (is_valid == 1) {
-					//alert("Valid Input");
-					// send ajax request to vector() in views
-				//} else {
-					//alert("Invalid Input");
-				//}
+			
+			/* 
+			** passes data sent back by Django views.py to be handled 
+			** is_valid: "0" or "1" to indicate if user should be prompted to re-enter their input]
+			** v1_comp and v2_comp: "cleaned" version of user input (e.g. removing white space)
+			*/
+			function handleValidationResult(is_valid, v1, v2, operation) {
+				// checks if user's input was deemed valid by validate() in Django views.py
+				if (is_valid == "1") {
+					alert("Valid Input");
+					//send ajax request to vector() in views
+				} else {
+					alert("Invalid Input");
+				}
 
 			}
 		</script>

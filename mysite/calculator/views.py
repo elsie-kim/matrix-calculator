@@ -78,7 +78,8 @@ def validate(request):
         # getting user's inputs from "Vector 1" and "Vector 2"
         v1 = request.GET['v1']
         v2 = request.GET['v2']
-        
+        operation = request.GET['operation']
+ 
         # receive "cleaned" or empty list
         v1_comp = validate_vector(v1)
         v2_comp = validate_vector(v2)
@@ -92,7 +93,8 @@ def validate(request):
         data = {
             'is_valid' : str(is_valid),
             'v1_clean' : str(v1_comp),
-            'v2_clean' : str(v2_comp)
+            'v2_clean' : str(v2_comp),
+            'operation' : str(operation),
         }
 
     except:

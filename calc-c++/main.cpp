@@ -17,10 +17,10 @@ std::ostream& operator << (std::ostream& output, std::vector<int> v)
 };
 
 // handles vector inputs (when "-v" is used)
-std::vector<std::vector<int>> vector_handler(int argc, char* argv[])
+std::vector<std::vector<float>> vector_handler(int argc, char* argv[])
 {
     std::string x;
-    std::vector<int> v1, v2;
+    std::vector<float> v1, v2;
     int a; 
         
     	// put each component of vector 1 into vector v1
@@ -49,20 +49,11 @@ std::vector<std::vector<int>> vector_handler(int argc, char* argv[])
 		v2.push_back(std::stof(x));
         }
     
-//         for (int i=0; i < v1.size(); i++)
-//         {
-//             std::cout << v1[i] << "\t" << v2[i] << std::endl;
-//         }
         return {v1, v2};
 }
 
 int main(int argc, char* argv[])
 {
-//     std::vector<int> v1 = {1, 4};
-//     std::vector<int> v2 = {3, 2};
-//     
-//     std::vector<int> v3 = {1, 2, 3};
-//     std::vector<int> v4 = {1, 5 ,7};
     Calculator calc;
     
     int operation = std::stoi(argv[2]); // user-specified operation
@@ -72,7 +63,7 @@ int main(int argc, char* argv[])
     // checking for "-v", which indicates vector operation
     if (x.compare("-v") == 0)
     {
-        std::vector<std::vector<int>> vectors = vector_handler(argc, argv);
+        std::vector<std::vector<float>> vectors = vector_handler(argc, argv);
         
         switch(operation)
         {

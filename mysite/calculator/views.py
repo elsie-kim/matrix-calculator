@@ -58,7 +58,7 @@ def validate_vector(request):
                 for j in x:
                     try:
                         # finding non-numerical characters
-                        j = int(j)
+                        j = float(j)
         
                         # add to new string which holds the "cleaned" input
                         v_split_2 += str(j) + " "
@@ -127,7 +127,16 @@ def calculate_vector(request):
     
     os.chdir("/home/elsie/calculator/matrix-calculator/calc-c++/")
     format_input(v1, v2)
-    answer =str(float(subprocess.check_output(input_cmd))) # change to int if int, float if float
+
+    answer = subprocess.check_output(input_cmd)
+    print(answer)
+    # format as a scalar value if dot product
+    if operation == "0":
+        # return int if answer is int, float if answer is float 
+        try:
+            answer = str(int(answer))
+        except:
+            answer = str(float(answer))
 
     data = {
         'answer': answer

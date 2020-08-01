@@ -3,9 +3,9 @@
 
 // Calculates the dot product of two vectors v1 and v2
 
-float Calculator::dot_product(std::vector<int>& v1, std::vector<int>& v2)
+float Calculator::dot_product(std::vector<float>& v1, std::vector<float>& v2)
 {
-    int sum = 0;
+    float sum = 0;
     
     for (int i=0; i < v1.size(); i++)
     {

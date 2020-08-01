@@ -1,80 +1,162 @@
-<!DOCTYPE HTML>
-<html>
-	<h1>Vector Calculator</h1>
-
-	{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-	<!--
-	<form action="{% url 'vector_api' %}" method="GET">
-		<p>Vector 1</p><br>
-		<label for="x1">x:</label>
-		<input type="number" name="x1"><br><br>
-		<label for="y1">y:</label>
-		<input type="number" name="y1"><br><br>
-	<label for="z1">z:</label>
-	<input type="number" name="z1"><br><br><br> 
-		<p>Vector 2</p><br>
-		<label for="x2">x:</label>
-		<input type="number" name="x2"><br><br>
-		<label for="y2">y:</label>
-		<input type="number" name="y2"><br><br>
-
-	<label for="z2">z:</label>
-	<input type="number" name="z2"><br><br>
-
-		
-		<label for="operation">Operation:</label>
-
-		<select name="operation" id="operation">
-			<option value=0>Dot Product</option>
-		</select>
-
-		<input type="submit" value="Submit">
-	<form>
-	-->
-
+{% extends 'base.html' %}
 	{% block content %}
-		<form action="" method="get">
-		{% csrf_token %}
-		{{ form }}
-		{{ operation.label|linebreaks }}
-		<input type="submit" value="Submit" />
-	</form>
+		<h>Vector Calculator</h>
+		<form id="vector" method="GET">
+			{% csrf_token %}
+			{{ form.as_p }}
+			<button type="submit" id="vector-submit">Enter</button>
+		</form>
+		
+		<body>
+			<p id="message">Hi</p>
+		</body>
+		
+		<script type="text/javascript">
+			document.getElementById("vector-submit").addEventListener("click", vectorInput);
+
+			function vectorInput(e) {
+				$(document).on('submit', '#vector', function(e){
+					e.preventDefault();
+
+					$.ajax({
+						type: 'GET',
+						url: '/vector/validate/',
+						data: {  
+							'v1': document.getElementById('id_vector1').value,
+							'v2': document.getElementById('id_vector2').value,
+							csrfmiddlewaretoken: '{{ csrf_token }}'
+						},
+						dataType: 'json',
+						success: function(data){
+							console.log(data.is_valid);
+
+						}
+					});
+				});
+						
+			}
+
+			function handleValidationResult() {
+				//if (is_valid == 1) {
+					//alert("Valid Input");
+					// send ajax request to vector() in views
+				//} else {
+					//alert("Invalid Input");
+				//}
+
+			}
+		</script>
 	{% endblock %}
 
-	{% if messages %}
-	<ul class="messages">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<!--
+	<h1>Vector Calculator</h1>-->
+	{% comment %}
+	{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+	{% endcomment %}
+	<!--
+	<p id="response_msg">Hello</p>
+	<form id="dimension" method="GET">
+		dimension: <input type="number" name="dimension" />
+		<button type="submit">Enter</button>
+	</form>
+	-->
+	{% comment %}
+	<script type='text/javascript'> 
+	</script>
+	<form id="vector" method="get">{% csrf_token %}
+			{#% csrf_token %#}
+			<label for="vector">Vector:</label>
+			<input type="text" id="vector" name="vector"><br><br>
+			<input type="submit" value="Enter">
+	</form>{% endcomment %}
+<!--
+<script type="text/javasript">
+		var is_valid = {{ is_valid }};
+		if (is_valid == 0) {
+			alert("Invalid Input");
+		}
+</script>-->
+	{% comment %}
+	<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+
+	<script type="text/javascript">
+		$(document).on('submit', '#vector', function(e){
+			e.preventDefault();
+
+			$.ajax({
+				type:'GET',
+				url:'/vector/',
+				data:{
+					vector:$('#vector').val(),
+					csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+				},
+				success:function(){
+				//		if (!vector.valid_input) {
+				//			alert("Invalid input");
+				//		}
+				}
+			});
+		});
+	</script>
+
+
+	{% comment %}
+		<form action="" method="get">
+			{% csrf_token %}
+			{{ form }}
+			{{ operation.label|linebreaks }}
+			<input type="submit" value="Submit" />	
+		</form>
+	{#% comment %#}
+		{#% endblock %#}
+
+		{% if messages %}
+		<ul class="messages">
 		{% for message in messages %}
 		<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
 		{% endfor %}
-	</ul>
-	{% endif %}
-
-	<div id="myFrame">
-		
-	</div>
-		
-
-	<button onclick="reloadDiv()">Reload Div</button>
+		</ul>
+		{% endif %}  
+	
+	{% endcomment %}
 
 
 	
-</html>
 
-<script id="vector">
-	let numFields = 6; // un-hardcode this
-	function noEmptyFields() {
-		empty = False;
-	}
-	function reloadDiv() {
-		getElementById("myFrame").reload();
-	}
 
-	function loadAnswer() {
-		var answer = JSON.parse(document.getElementById('vector').textContext);
+ 
 
-		//if (answer.localeCompare("None") != 0) {
-			
-		//}
 
-	}
-</script>

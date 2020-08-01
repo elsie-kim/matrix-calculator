@@ -5,7 +5,6 @@ from . import views
 urlpatterns = [
         path('', views.index, name='index'),
         path('vector/', views.vector, name='vector'),
-        path('vectorapi/', views.vector_api, name='vector_api'),
-#        path('matrix/', views.matrix, name='matrix'),
+        path('vector/validate/', views.validate, name='validate'),
         path('help/', views.help, name='help'),
 ]

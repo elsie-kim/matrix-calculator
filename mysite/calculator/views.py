@@ -64,7 +64,10 @@ def validate_vector(request):
                         v_split_2 += str(j) + " "
                 
                     except:
-                        pass
+                        if j != "":
+                            return j
+                        else:
+                            pass
             # return list of components
             return v_split_2 
 
@@ -86,15 +89,27 @@ def validate_vector(request):
         
         # validate user input
         if v1_clean != "" and v2_clean != "" and len(v1_clean.split(" ")) == len(v2_clean.split(" ")):
-            is_valid = 1
+            if operation == "1":
+                if len(v1_clean.split(" ")) == 4:
+                    is_valid = 1
+                    message = ""
+                else:
+                    is_valid = 0
+                    message = "The cross product is limited to 3D vectors"
+            else:
+                is_valid = 1
+                message = ""
+
         else:
             is_valid = 0
+            message = "Invalid input"
         
         data = {
             'is_valid': str(is_valid),
             'v1_clean': v1_clean,
             'v2_clean': v2_clean,
             'operation' : str(operation),
+            'message': message,
         }
 
     except:
@@ -129,7 +144,7 @@ def calculate_vector(request):
     format_input(v1, v2)
 
     answer = subprocess.check_output(input_cmd)
-    print(answer)
+
     # format as a scalar value if dot product
     if operation == "0":
         # return int if answer is int, float if answer is float 
@@ -137,6 +152,9 @@ def calculate_vector(request):
             answer = str(int(answer))
         except:
             answer = str(float(answer))
+    else:
+        answer = str(answer)
+        answer = answer[2:-3]
 
     data = {
         'answer': answer

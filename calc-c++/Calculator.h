@@ -11,9 +11,9 @@ class Calculator
 {
     public:
         std::vector<std::string> operations = {"dot_product"};
-        float dot_product(std::vector<float>& v, std::vector<float>& v2);
-        
-        
+	std::string int_or_float(float x);   
+	float dot_product(std::vector<float>& v, std::vector<float>& v2);
+	std::string cross_product(std::vector<float>&v, std::vector<float>& v2); 
 
 };
 

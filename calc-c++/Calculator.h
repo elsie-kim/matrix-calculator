@@ -16,7 +16,9 @@ class Calculator
 	std::string concatenate(std::string x);
 	std::string round_val(std::string x);
 	float dot_product(std::vector<float>& v, std::vector<float>& v2);
-	std::string cross_product(std::vector<float>&v, std::vector<float>& v2); 
+	std::string cross_product(std::vector<float>&v, std::vector<float>& v2);
+
+	std::string multiplication(std::vector<std::vector<float>>& m1, std::vector<std::vector<float>>& m2);	
 
 };
 

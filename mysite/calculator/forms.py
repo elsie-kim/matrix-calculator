@@ -1,6 +1,4 @@
 from django import forms
-from django.utils.safestring import mark_safe
-
 
 # Handles front-end input 
 class VectorForm(forms.Form):
@@ -9,7 +7,11 @@ class VectorForm(forms.Form):
     OPERATION_LIST = [(0, 'Dot Product'), (1, 'Cross Product')]
     operation = forms.ChoiceField(label='\nOperation:', choices=OPERATION_LIST) 
 
-
+class MatrixForm(forms.Form):
+    matrix1 = forms.CharField(widget=forms.Textarea)
+    matrix2 = forms.CharField(widget=forms.Textarea)
+    OPERATION_LIST = [(0, 'Multiplication'), (1, 'Addition')]
+    operation = forms.ChoiceField(label='Operation:', choices=OPERATION_LIST)
 
 
 

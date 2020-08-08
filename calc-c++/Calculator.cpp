@@ -1,7 +1,6 @@
 #include "Calculator.h"
 
-// Calculates the dot product of two vectors v1 and v2
-
+// rounds based on whether "x" is actually an int or a float value
 std::string Calculator::int_or_float(float x) {
 	if (x == int(x)) {
 		int y = int(x);
@@ -12,6 +11,7 @@ std::string Calculator::int_or_float(float x) {
 	}
 }
 
+// concatenates trailing zeros on "x"
 std::string Calculator::concatenate(std::string x) {
 	std::string::size_type index = x.find('.');
 
@@ -24,6 +24,7 @@ std::string Calculator::concatenate(std::string x) {
 	return x;
 }
 
+// rounds "x" to nearest ten thousandth --- will adjust to allow user to specify degree of accuracy
 std::string Calculator::round_val(std::string x) {
 	float y = std::stof(x);
 	y *= 10000;
@@ -37,6 +38,7 @@ std::string Calculator::round_val(std::string x) {
 	
 }
 
+// dot product of two vectors
 float Calculator::dot_product(std::vector<float>& v1, std::vector<float>& v2)
 {
 	float sum = 0;
@@ -56,6 +58,7 @@ float Calculator::dot_product(std::vector<float>& v1, std::vector<float>& v2)
 	return sum;
 }
 
+// cross product of two vectors --- only supports 3D vectors, might add 7D later
 std::string Calculator::cross_product(std::vector<float>&v1, std::vector<float>& v2) 
 {
 	std::string ans;
@@ -69,3 +72,12 @@ std::string Calculator::cross_product(std::vector<float>&v1, std::vector<float>&
 	return ans;
 }
 
+// multiplies two matrices
+std::string Calculator::multiplication(std::vector<std::vector<float>>& m1, std::vector<std::vector<float>>& m2) 
+{
+	std::string ans = "";
+
+	// multiply matrices
+
+	return ans;
+}

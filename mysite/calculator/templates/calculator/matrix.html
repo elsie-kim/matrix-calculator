@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+	{% block content %}
+		<h>Matrix Calculator</h>
+		<form id="matrix" method="GET">
+			{% csrf_token %}
+			{{ form.as_p }}
+			<button type="submit" id="matrix-submit">Enter</button>
+		</form>
+
+		<script type="text/javascript">
+			document.getElementById("matrix-submit").addEventListener("click", matrixInput);
+
+			function matrixInput(e) {
+				$(document).on('submit', '#matrix', function(e){
+					e.preventDefault();
+
+					$.ajax({
+						type: 'GET',
+						url: '/matrix/validate/',
+						data: {
+							'm1': document.getElementById('id_matrix1').value,
+							'm2': document.getElementById('id_matrix2').value,
+							'operation': document.getElementById('id_operation').value,
+							csrfmiddlewaretoken: '{{ csrf_token }}',
+						},
+						dataType: 'json',
+						success: function(data){
+							handleValidationResult(data.is_valid, data.m1, data.m2);
+						}
+					});
+				});
+			}
+
+			function handleValidationResult(is_valid, m1, m2) {
+				if (is_valid == "1") {
+					console.log(m1);
+					console.log(m2);
+					console.log('Success');
+				} else {
+					console.log("Invalid input");
+				}
+			}
+
+		</script>
+	{% endblock %}

@@ -3,7 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 import subprocess, os
 
-from .forms import VectorForm
+from .forms import VectorForm, MatrixForm
 
 # Create your views here.
 # Front page
@@ -162,197 +162,99 @@ def calculate_vector(request):
 
     return JsonResponse(data)
 
+# 'matrix/' page
+def matrix(request):
+    try:
+        form = MatrixForm()
+    except:
+        pass
+
+    context = {'form' : form}
+    
+    return render(request, 'calculator/matrix.html', context)
+
+# determins whether user's input is useable or not
+def validate_matrix(request):
+    m1 = request.GET.get('m1')
+    m2 = request.GET.get('m2')
+
+    m1_clean = ""
+    m2_clean = ""
+
+    # split chunk of text into lines
+    m1_split = m1.splitlines()
+    m2_split = m2.splitlines()
+
+    is_valid = 2
+
+    # split lines into individual components
+    # and add "-n" to indicate a new line, so that main.cpp
+    # can process the string and split into 2D vectors
+    for i in range(len(m1_split)-1):
+        x = m1_split[i].split()
+        y = m1_split[i+1].split()
+
+        a = [i.strip(" ") for i in x]
+        b = [i.strip(" ") for i in y]
+
+        if len(a) != len(b):
+            is_valid = 0
+            break
+
+        else:
+            is_valid = 1
+   
+    if (is_valid == 1):
+        for i in range(len(m2_split)-1):
+            x = m2_split[i].split()
+            y = m2_split[i+1].split()
+
+            a = [i.strip(" ") for i in x]
+            b = [i.strip(" ") for i in y]
 
 
+            if len(a) != len(b):
+                is_valid = 0
+                break
+            else:
+                is_valid = 1
 
+        if (is_valid == 1):
 
+            for i in m1.splitlines():
+                m1_clean += "-n "
+                for j in i:
+                    try:
+                        j = float(j)
+                        m1_clean += str(j) + " "
 
+                    except:
+                        if j!= " ":
+                            is_valid = 0
+                            break
 
+            for i in m2.splitlines():
+                m2_clean += "-n "
+                
+                for j in i:
+                    try:
+                        j = float(j)
+                        m2_clean += str(j) + " "
+                    
+                    except:
+                        if j != " ":
+                            is_valid = 0
+                            break
+    
+    data = {
+        'is_valid': is_valid,
+        'm1': m1_clean,
+        'm2': m2_clean,
+#        'operation'
+    }
 
+    return JsonResponse(data)
 
+def calculate_matrix(request):
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-##def dimension(request):
-##    dimension = int(request.GET.get('dimension'))
-##
-##    def not_valid(d):
-##        if d > 0:
-##            return False
-##        return True
-##
-##    data = {
-##            'not_valid': not_valid(dimension)
-##    }
-##    return JsonResponse(data)
-#
-## Vector Calculator ("vector/")
-#def vector(request):
-#    def valid_input(v):
-#        # check that the components are surrounded by parentheses
-#        if v == "":
-#            return False
-#        elif v[0] == '(' and v[-1] == ')':
-#            # remove parentheses
-#            v_split = v[1:-1]
-#           
-#            # remove spaces
-#            v_split = v_split.split(' ')
-#            v_split_2 = []
-#             
-#            for i in v_split:
-#                x = i.split(',')
-#            
-#                for j in x:
-#                    try:
-#                        j = int(j)
-#                        #v_split_2.append(j)
-#                        
-#                    except:
-#                        return False
-#            return True
-#
-#        else:
-#            return False
-#
-#    vector = None
-#    try:
-#        vector = request.GET['vector']
-#        print("step1")
-#    except:
-#        pass
-#
-#    if (vector):
-#        print("step2")
-#        print(valid_input(vector))
-#
-#        if not valid_input(vector):
-#            def get_context_data(self, **kwargs):
-#                context = super(VectorView, self).get_context_data(**kwargs)
-#                context['is_valid'] = int(valid_input(vector))
-#                return context
-#            return 
-#            
-#             
-#
-#
-#    #except:
-#        #print("Hi")
-#   # def parse_vector(v):
-#
-#   # 
-#
-#
-#   # try: 
-#   #     dimension = request.GET.get('dimension')
-#   #     print(dimension)
-#   # except:
-#   #     print("Exception")
-#    
-#
-#    #try:
-#    #form = VectorForm() 
-#
-#    #except:
-#    
-#    #try:
-#        #dimension = request.GET.get('dimension')
-#        #print(dimension)
-#    
-#        #try: 
-#            #form = VectorForm(request.GET or None)
-#        
-#            #x1 = str(form['x1'].value())
-#            #y1 = str(form['y1'].value())
-#            #x2 = str(form['x2'].value())
-#            #y2 = str(form['y2'].value())
-#            #operation = form['operation'].value()
-#
-#            #os.chdir("/home/elsie/calculator/matrix-calculator/calc-c++/")
-#            #input_cmd = ["./a.out", "-v", operation, "-v1", x1, y1, "-v2", x2, y2]
-#            #answer = subprocess.check_output(input_cmd)
-#            #print(float(answer))
-#            
-#            #messages.add_message(request, messages.INFO, "Answer: " + str(float(answer)))
-#        #except:
-#            #print("HIII")
-#        
-#    #except:
-#        #print("Fields empty") 
-#
-#    return render(request, 'calculator/vector.html')
-#
-#def vector_landing(request):
-#    dimension = request.GET['dimension']
-#    print(dimension)
-# 
-#    return HttpResponse('')
-#
-#
-#def vector_api(request):
-#    #x1 = request.GET.get('x1')
-#    #y1 = request.GET.get('y1')
-#    #x2 = request.GET.get('x2')
-#    #y2 = request.GET.get('y2')
-#    #operation = request.GET.get('operation')
-#
-#    #os.chdir("/home/elsie/calculator/matrix-calculator/calc-c++/")
-#    
-#    #operation?
-#    #input_cmd = ["./a.out", "-v", operation, "-v1", x1, y1, "-v2", x2, y2]
-#    ##subproc = subprocess.Popen(output, stdout=subprocess.PIPE)
-#    #answer = subprocess.check_output(input_cmd)
-#
-#
-#    return HttpResponse("Hi")
+    return HttpResponse("Hello")

@@ -72,12 +72,35 @@ std::string Calculator::cross_product(std::vector<float>&v1, std::vector<float>&
 	return ans;
 }
 
+void print_vector(std::vector<float> v)
+{
+	for (float a : v) {
+		std::cout << a << " ";
+	}
+	std::cout << std::endl;
+
+}
+
 // multiplies two matrices
 std::string Calculator::multiplication(std::vector<std::vector<float>>& m1, std::vector<std::vector<float>>& m2) 
 {
-	std::string ans = "";
+	std::string ans = "\n";
+	
+	// use the dot_product() method to find each component of the product
+	for (std::vector<float> a : m1) {
+		for (int i=0; i<m2[0].size(); i++) {
+			std::vector<float> b;
+			for (int j=0; j<m2.size(); j++) {
+				b.push_back(m2[j][i]);
+	
+			}
 
-	// multiply matrices
+			ans += int_or_float(dot_product(a, b)) + " ";
+		}
+
+		ans += "\n";
+	}
 
 	return ans;
 }
+

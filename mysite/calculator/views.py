@@ -186,6 +186,7 @@ def validate_matrix(request):
     m2_split = m2.splitlines()
 
     is_valid = 2
+    message=""
 
     # split lines into individual components
     # and add "-n" to indicate a new line, so that main.cpp
@@ -196,15 +197,25 @@ def validate_matrix(request):
 
         a = [i.strip(" ") for i in x]
         b = [i.strip(" ") for i in y]
-
+        
+        # for a matrix, each row must be of equal dimension
         if len(a) != len(b):
             is_valid = 0
+            message = "Rows must be equal in dimension"
+            break
+       
+        # for matrix A of dimensions (m x n) and matrix B of dimensions (p x q),
+        # n must be equal to p in order for multiplication to be a valid
+        # operation
+        elif len(m1_split) != len(b):
+            is_valid = 0
+            message = "The number of columns of matrix 1 must match the number of rows of matrix 2"
             break
 
         else:
             is_valid = 1
-   
-    if (is_valid == 1):
+
+    elif (is_valid == 1):
         for i in range(len(m2_split)-1):
             x = m2_split[i].split()
             y = m2_split[i+1].split()
@@ -250,7 +261,9 @@ def validate_matrix(request):
         'is_valid': is_valid,
         'm1': m1_clean,
         'm2': m2_clean,
-#        'operation'
+        'operation', operation,
+        'message': message,
+
     }
 
     return JsonResponse(data)

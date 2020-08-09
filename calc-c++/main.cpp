@@ -69,11 +69,12 @@ std::vector<std::vector<std::vector<float>>> matrix_handler(int argc, char* argv
 	std::string x;
 	std::vector<std::vector<float>> m1, m2;
 	bool is_m2 = false;
-
-	for (int i=3; i<argc; i++)
+	
+	// start at first "-n"
+	for (int i=4; i<argc; i++)
 	{
 		x = argv[i];
-
+		
 		if (x.compare("-m2") != 0 && !(is_m2)) {
 			std::vector<float> row;
 			int j = i+1;
@@ -85,7 +86,6 @@ std::vector<std::vector<std::vector<float>>> matrix_handler(int argc, char* argv
 				row.push_back(std::stof(y));
 				j++;
 				y = argv[j];
-
 			}
 
 			m1.push_back(row);
@@ -141,16 +141,16 @@ int main(int argc, char* argv[])
     	} else // "-m" for matrix
 	{
 		std::vector<std::vector<std::vector<float>>> matrices = matrix_handler(argc, argv);
-		print_vector(matrices[0]);
-		print_vector(matrices[1]);
+		//print_vector(matrices[0]);
+		//print_vector(matrices[1]);
 
-//		switch(operation) 
-//		{
-//			case 0:
-//				std::cout << calc.multiplication(matrices[0], matrices[1]) << std::endl;
-//				break;
+		switch(operation) 
+		{
+			case 0:
+				std::cout << calc.multiplication(matrices[0], matrices[1]) << std::endl;
+				break;
 
-		//}
+		}
 
 	}	
     

@@ -171,11 +171,9 @@ int main(int argc, char* argv[])
         
     	} else // "-m" for matrix
 	{
+		
 		std::vector<std::vector<std::vector<float>>> matrices;
 		std::vector<std::vector<float>> matrix;
-
-		//print_vector(matrices[0]);
-		//print_vector(matrices[1]);
 
 		switch(operation) 
 		{
@@ -185,13 +183,16 @@ int main(int argc, char* argv[])
 				break;
 			case 1:
 				matrix = matrix_handler(argc, argv);
-				//print_vector(matrix);;
-				std::cout << calc.reduced_row_echelon(matrix);
+				std::cout << calc.augmented_reduced_row_echelon(matrix);
 				break;
-
-			default:
+			case 2:
+				matrices = matrices_handler(argc, argv);
+				std::cout << calc.addition(matrices[0], matrices[1]);
 				break;
-				
+			case 3:
+				matrices = matrices_handler(argc, argv);
+				std::cout << calc.subtraction(matrices[0], matrices[1]);
+				break;	
 
 		}
 

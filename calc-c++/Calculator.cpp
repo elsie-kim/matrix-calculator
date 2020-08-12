@@ -132,8 +132,24 @@ void Calculator::eliminate_row(std::vector<float>& a, std::vector<float>& pivot,
 	}
 }
 
+std::string format_matrix(std::vector<std::vector<float>>& m)
+{
+	// format answer
+	std::string result = "";
+	result += "\n";
+	for (std::vector<float> a : m) 
+	{
+		for (float b : a)
+			result += std::to_string(b) + " ";
+		result += "\n";	
+	}
+
+	return result;
+
+}
+
 // produces an augmented matrix in reduced row echelon form (if possible) using Gaussian elimination
-std::string Calculator::reduced_row_echelon(std::vector<std::vector<float>>& m)
+std::string Calculator::augmented_reduced_row_echelon(std::vector<std::vector<float>>& m)
 {
 	if (m.size() > m[0].size())
 		return "";
@@ -184,37 +200,67 @@ std::string Calculator::reduced_row_echelon(std::vector<std::vector<float>>& m)
 		// if there is no solution (all three elements of a row are 0)
 		if (count == m[0].size()-1)
 		{
-			solution = 0;
-			return "No solution (RREF not possible)\n";
-			break;
+			if (m[0][m[0].size()-1] != 0)
+				return "Inconsistent system\n";
+			else
+				return format_matrix(m);
 		}
 	}
 
-	if (solution == 1)
+	// make the elements in the rows above the pivot element 0
+	for (int i=1; i < m.size(); i++) 
 	{
-		for (int i=1; i < m.size(); i++) 
+		for (int j=i-1; j >= 0; j--)
 		{
-			for (int j=i-1; j >= 0; j--)
-			{
-				eliminate_row(m[j], m[i], m[j][i]);
-			}
+			eliminate_row(m[j], m[i], m[j][i]);
 		}
 	}
-	
 
-
-	// format answer
-	std::string result = "";
-	result += "\n";
-	for (std::vector<float> a : m) 
-	{
-		print_vector(a);	
-	}
-	return result;
+	return format_matrix(m);
 
 
 }
 
+// adds two matrices
+std::string Calculator::addition(std::vector<std::vector<float>>& m1, std::vector<std::vector<float>>& m2) 
+{
+	std::vector<std::vector<float>> result;
+	float sum;
+
+	for (int i=0; i < m1.size(); i++)
+	{
+		std::vector<float> v;
+
+		for (int j=0; j < m1[0].size(); j++)
+		{
+			v.push_back(m1[i][j] + m2[i][j]);
+		}
+		result.push_back(v);
+	}
+
+	return format_matrix(result);
+}
+
+// subtracts the second matrix from the first
+std::string Calculator::subtraction(std::vector<std::vector<float>>& m1, std::vector<std::vector<float>>& m2) 
+{
+	std::vector<std::vector<float>> result;
+	float sum;
+
+	for (int i=0; i < m1.size(); i++)
+	{
+		std::vector<float> v;
+
+		for (int j=0; j < m1[0].size(); j++)
+		{
+			v.push_back(m1[i][j] - m2[i][j]);
+		}
+		result.push_back(v);
+	}
+
+	return format_matrix(result);
+
+}
 
 
 

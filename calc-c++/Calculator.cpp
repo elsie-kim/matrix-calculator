@@ -25,7 +25,7 @@ std::string Calculator::concatenate(std::string x) {
 }
 
 // rounds "x" to nearest ten thousandth --- will adjust to allow user to specify degree of accuracy
-std::string Calculator::round_val(std::string x) {
+std::string Calculator::round_val(std::string x) { // improve rounding accuracy
 	float y = std::stof(x);
 	y *= 10000;
 	y = round(y);
@@ -72,10 +72,10 @@ std::string Calculator::cross_product(std::vector<float>&v1, std::vector<float>&
 	return ans;
 }
 
-void print_vector(std::vector<float> v)
+void Calculator::print_vector(std::vector<float> v)
 {
 	for (float a : v) {
-		std::cout << a << " ";
+		std::cout << a << "\t";
 	}
 	std::cout << std::endl;
 
@@ -103,4 +103,131 @@ std::string Calculator::multiplication(std::vector<std::vector<float>>& m1, std:
 
 	return ans;
 }
+
+// swap two rows in a 2D vector
+void Calculator::swap(std::vector<float>& a, std::vector<float>& b)
+{
+	a.swap(b);
+}
+
+// divide every element in a vector by val
+void Calculator::divide_row(std::vector<float>& a, float val)
+{
+	for (int i=0; i < a.size(); i++) 
+	{	
+		//std::string quotient = int_or_float(a[i] / val);// improve rounding	
+		//a[i] = std::stof(quotient);
+		a[i] = a[i] / val;
+	}
+}
+
+// subtract every element in a vector by the corresponding pivot row value multiplied by val
+void Calculator::eliminate_row(std::vector<float>& a, std::vector<float>& pivot, float val) 
+{
+	for (int i=0; i<a.size(); i++)
+	{
+		//std::string diff = int_or_float(a[i] -  (pivot[i] * val)); 
+		//a[i] = std::stof(diff);
+		a[i] = a[i] - (pivot[i] * val);
+	}
+}
+
+// produces an augmented matrix in reduced row echelon form (if possible) using Gaussian elimination
+std::string Calculator::reduced_row_echelon(std::vector<std::vector<float>>& m)
+{
+	if (m.size() > m[0].size())
+		return "";
+		
+	int solution = 1, count;
+
+
+	for (int i=0; i < m.size(); i++) 
+	{	
+		// moving rows if the pivot element is 0
+		if (m[i][i] == 0) 
+		{
+			// don't swap row if this is the last row
+			if (i == m.size()-1)
+				break;
+			else 
+				swap(m[i], m[i+1]);
+		}
+		
+		// divide row to make pivot element 1	
+		divide_row(m[i], m[i][i]);
+	
+		// makes corresponding elements in latter columns 0 
+		for (int j=i+1; j<m.size(); j++) 
+		{
+			eliminate_row(m[j], m[i], m[j][i]);
+		}
+		
+		// if not the first row, start eliminating the above the row
+		if (i > 0) 
+		{
+			for (int j=i-1; j >= 0; j--) 
+			{
+				eliminate_row(m[j], m[i], m[j][i]);
+			}
+		}
+	}
+
+	for (int i=0; i < m.size(); i++) {
+		count = 0;
+
+		for (int j=0; j < m[0].size()-1; j++) 
+		{	
+			if (m[i][j] == 0)
+				count++;
+		}
+		
+		// if there is no solution (all three elements of a row are 0)
+		if (count == m[0].size()-1)
+		{
+			solution = 0;
+			return "No solution (RREF not possible)\n";
+			break;
+		}
+	}
+
+	if (solution == 1)
+	{
+		for (int i=1; i < m.size(); i++) 
+		{
+			for (int j=i-1; j >= 0; j--)
+			{
+				eliminate_row(m[j], m[i], m[j][i]);
+			}
+		}
+	}
+	
+
+
+	// format answer
+	std::string result = "";
+	result += "\n";
+	for (std::vector<float> a : m) 
+	{
+		print_vector(a);	
+	}
+	return result;
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

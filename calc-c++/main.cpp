@@ -64,7 +64,7 @@ std::vector<std::vector<float>> vector_handler(int argc, char* argv[])
 }
 
 // organises string into 2D vectors to represent matrices
-std::vector<std::vector<std::vector<float>>> matrix_handler(int argc, char* argv[])
+std::vector<std::vector<std::vector<float>>> matrices_handler(int argc, char* argv[])
 {
 	std::string x;
 	std::vector<std::vector<float>> m1, m2;
@@ -114,6 +114,37 @@ std::vector<std::vector<std::vector<float>>> matrix_handler(int argc, char* argv
 	
 	return {m1, m2};
 }
+
+std::vector<std::vector<float>> matrix_handler(int argc, char* argv[])
+{
+	std::string x = "";
+	std::vector<std::vector<float>> matrix;
+
+	for (int i=3; i<argc; i++)
+	{
+		x = argv[i];
+
+		if (x.compare("-n") == 0) 
+		{
+			int j = i+1;
+			std::string y = argv[j];
+			std::vector<float> row;
+
+			while (y.compare("-n") != 0 && j < argc) {
+				row.push_back(std::stof(y));
+				j++;
+				y = j < argc ? argv[j] : "";
+			
+			}
+
+			matrix.push_back(row);
+			i = j-1; 
+			
+		}	
+	}
+
+	return matrix;
+}
 	
 int main(int argc, char* argv[])
 {
@@ -140,15 +171,27 @@ int main(int argc, char* argv[])
         
     	} else // "-m" for matrix
 	{
-		std::vector<std::vector<std::vector<float>>> matrices = matrix_handler(argc, argv);
+		std::vector<std::vector<std::vector<float>>> matrices;
+		std::vector<std::vector<float>> matrix;
+
 		//print_vector(matrices[0]);
 		//print_vector(matrices[1]);
 
 		switch(operation) 
 		{
 			case 0:
+				matrices = matrices_handler(argc, argv);
 				std::cout << calc.multiplication(matrices[0], matrices[1]) << std::endl;
 				break;
+			case 1:
+				matrix = matrix_handler(argc, argv);
+				//print_vector(matrix);;
+				std::cout << calc.reduced_row_echelon(matrix);
+				break;
+
+			default:
+				break;
+				
 
 		}
 

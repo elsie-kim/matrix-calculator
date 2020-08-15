@@ -176,17 +176,24 @@ def matrix(request):
 # determins whether user's input is useable or not
 def validate_matrix(request):
     m1 = request.GET.get('m1')
-    m2 = request.GET.get('m2')
+    operation = request.GET['operation']
 
     m1_clean = ""
-    m2_clean = ""
-
+    m1_split = m1.splitlines()
     # split chunk of text into lines
     m1_split = m1.splitlines()
-    m2_split = m2.splitlines()
 
     is_valid = 2
-    message=""
+    message = ""
+
+    if operation != "1":
+        m2 = request.GET.get('m2')
+        m2_clean = ""
+        
+        try:
+            m2_split = m2.splitlines()
+        except:
+            pass
 
     # split lines into individual components
     # and add "-n" to indicate a new line, so that main.cpp
@@ -207,67 +214,120 @@ def validate_matrix(request):
         # for matrix A of dimensions (m x n) and matrix B of dimensions (p x q),
         # n must be equal to p in order for multiplication to be a valid
         # operation
-        elif len(m1_split) != len(b):
+        elif operation == "0" and len(m1_split) != len(b):
             is_valid = 0
             message = "The number of columns of matrix 1 must match the number of rows of matrix 2"
             break
 
         else:
             is_valid = 1
+    
+    if is_valid == 1:
+        for i in m1.splitlines():
+            m1_clean += "-n "
+            for j in i.split(" "):
+                try:
+                    j = float(j)
+                    m1_clean += str(j) + " "
 
-    elif (is_valid == 1):
-        for i in range(len(m2_split)-1):
-            x = m2_split[i].split()
-            y = m2_split[i+1].split()
+                except:
+                    if j!= " " or j!= "":
+                        is_valid = 0
+                        break
+        
+        if operation != "1":
+            for i in range(len(m2_split)-1):
+                x = m2_split[i].split()
+                y = m2_split[i+1].split()
 
-            a = [i.strip(" ") for i in x]
-            b = [i.strip(" ") for i in y]
+                a = [i.strip(" ") for i in x]
+                b = [i.strip(" ") for i in y]
 
 
-            if len(a) != len(b):
-                is_valid = 0
-                break
-            else:
-                is_valid = 1
+                if len(a) != len(b):
+                    is_valid = 0
+                    break
+                else:
+                    is_valid = 1
 
-        if (is_valid == 1):
+            if (is_valid == 1):
 
-            for i in m1.splitlines():
-                m1_clean += "-n "
-                for j in i:
-                    try:
-                        j = float(j)
-                        m1_clean += str(j) + " "
-
-                    except:
-                        if j!= " ":
-                            is_valid = 0
-                            break
-
-            for i in m2.splitlines():
-                m2_clean += "-n "
-                
-                for j in i:
-                    try:
-                        j = float(j)
-                        m2_clean += str(j) + " "
+    #            for i in m1.splitlines():
+    #                m1_clean += "-n "
+    #                for j in i:
+    #                    try:
+    #                        j = float(j)
+    #                        m1_clean += str(j) + " "
+    #
+    #                    except:
+    #                        if j!= " ":
+    #                            is_valid = 0
+    #                            break
+    #
+                for i in m2.splitlines():
+                    m2_clean += "-n "
                     
-                    except:
-                        if j != " ":
-                            is_valid = 0
-                            break
+                    for j in i.split(" "):
+                        try:
+                            j = float(j)
+                            m2_clean += str(j) + " "
+                        
+                        except:
+                            if j != " ":
+                                is_valid = 0
+                                break
     
     data = {
         'is_valid': is_valid,
         'm1': m1_clean,
-        'm2': m2_clean,
-        'operation', operation,
+        'operation': operation,
         'message': message,
-
     }
-
+    
+    if operation != "1":
+        data['m2'] = m2_clean
+    
     return JsonResponse(data)
 
 def calculate_matrix(request):
+    m1 = request.GET['m1']
+    operation = request.GET['operation']
+    
+    input_cmd = ['./a.out', '-m', operation]
 
-    return HttpResponse("Hello")
+    if operation != "1":
+        m2 = request.GET['m2']
+
+        input_cmd.append('-m1')
+
+        for i in m1.split(" "):
+            if i != "":
+                input_cmd.append(i)
+
+        input_cmd.append('-m2')
+
+        for i in m2.split(" "):
+            if i != "":
+                input_cmd.append(i)
+
+    else:
+        for i in m1.split(" "):
+            if i != "":
+                input_cmd.append(i)
+
+    os.chdir("/home/elsie/calculator/matrix-calculator/calc-c++/")
+
+    out = subprocess.Popen(input_cmd, stdout=subprocess.PIPE)
+    output = out.stdout.readlines()
+    
+    answer = ""
+
+    for i in output:
+        answer += str(i)[2:-3] + "-n "
+
+    data = {
+        'answer': answer,
+    }
+    
+    return JsonResponse(data)
+

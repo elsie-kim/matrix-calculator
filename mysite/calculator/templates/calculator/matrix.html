@@ -6,39 +6,129 @@
 			{{ form.as_p }}
 			<button type="submit" id="matrix-submit">Enter</button>
 		</form>
-
+	
+		<p id = "message"></p>
+	
 		<script type="text/javascript">
 			document.getElementById("matrix-submit").addEventListener("click", matrixInput);
 
 			function matrixInput(e) {
-				$(document).on('submit', '#matrix', function(e){
-					e.preventDefault();
+				var a = document.getElementById('id_matrix1').value;
+				var b = document.getElementById('id_matrix2').value;
+				
+				if (document.getElementById('id_operation').value != "1" && a!= null && a != "" && b != null && b != "") {
+					$(document).on('submit', '#matrix', function(e){
+						e.preventDefault();
 
+						$.ajax({
+							type: 'GET',
+							url: '/matrix/validate/',
+							data: {
+								'm1': document.getElementById('id_matrix1').value,
+								'm2': document.getElementById('id_matrix2').value,
+								'operation': document.getElementById('id_operation').value,
+								csrfmiddlewaretoken: '{{ csrf_token }}',
+							},
+							dataType: 'json',
+							success: function(data){
+								handleValidationResult_one(data.is_valid, data.m1, data.m2, data.operation, data.message);
+							}
+						});
+					});
+				} else if (document.getElementById('id_operation').value == "1") {
+					$(document).on('submit', '#matrix', function(e){
+						e.preventDefault();
+
+						$.ajax({
+							type: 'GET',
+							url: '/matrix/validate/',
+							data: {
+								'm1': document.getElementById('id_matrix1').value,
+								'operation': document.getElementById('id_operation').value,
+								csrfmiddlewaretoken: '{{ csrf_token }}',
+							},
+							dataType: 'json',
+							success: function(data){
+								handleValidationResult_two(data.is_valid, data.m1, data.operation, data.message);
+							}
+						});
+					});
+				} else {
+					$(document).on('submit', '#matrix', function(e){
+						e.preventDefault();
+
+						$.ajax({
+							type: 'GET',
+							url: '/matrix/',
+							success: function() {
+								document.getElementById('message').innerHTML = "Please fill all fields";
+							}
+						});
+					});
+						
+				}
+			}
+
+			function handleValidationResult_one(is_valid, m1, m2, operation, message) {
+				if (is_valid == "1") {
 					$.ajax({
 						type: 'GET',
-						url: '/matrix/validate/',
+						url: '/matrix/calculate/',
 						data: {
-							'm1': document.getElementById('id_matrix1').value,
-							'm2': document.getElementById('id_matrix2').value,
-							'operation': document.getElementById('id_operation').value,
+							'm1': m1,
+							'm2': m2,
+							'operation': operation,
 							csrfmiddlewaretoken: '{{ csrf_token }}',
 						},
 						dataType: 'json',
 						success: function(data){
-							handleValidationResult(data.is_valid, data.m1, data.m2);
+							var ans = data.answer.split('-n');
+
+							var ans_formatted = '';
+
+							for (var i=0; i < ans.length; i++) {
+								if (ans[i] != '' && ans[i] != ' ') {
+									ans_formatted =	ans_formatted.concat(ans[i], "<br>");
+								}
+							}
+
+							document.getElementById('message').innerHTML = ans_formatted;
 						}
 					});
-				});
+				} else {
+					document.getElementById('message').innerHTML = message;
+				}
 			}
 
-			function handleValidationResult(is_valid, m1, m2) {
+			function handleValidationResult_two(is_valid, m, operation, message) {
 				if (is_valid == "1") {
-					console.log(m1);
-					console.log(m2);
-					console.log('Success');
+					$.ajax({
+						type: 'GET',
+						url: '/matrix/calculate/',
+						data: {
+							'm1': m,
+							'operation': operation,
+							csrfmiddlewaretoken: '{{ csrf_token }}',
+						},
+						dataType: 'json',
+						success: function(data){
+							var ans = data.answer.split('-n');
+							
+							var ans_formatted = '';
+							
+							for (var i=0; i < ans.length; i++) {
+								if (ans[i] != '')
+									ans_formatted = ans_formatted.concat(ans[i], "<br>");
+							}
+							
+							document.getElementById('message').innerHTML = ans_formatted;
+						}
+					});
 				} else {
-					console.log("Invalid input");
+					document.getElementById('message').innerHTML = message;
+
 				}
+
 			}
 
 		</script>

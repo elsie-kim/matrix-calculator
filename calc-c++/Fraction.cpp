@@ -14,7 +14,6 @@ Fraction::Fraction(int num, int denom)
 		this->denom = 1;
 	else
 		this->denom = denom;
-	std::cout << denom << std::endl;
 		if (denom < 0)
 			set_signs();
 		
@@ -42,7 +41,6 @@ void Fraction::set_print()
 
 void Fraction::set_signs()
 {
-	std::cout << "hi\n";
 	if (num > 0)
 	{
 		num *= -1;
@@ -93,15 +91,21 @@ void Fraction::divide(Fraction that)
 
 void Fraction::add(Fraction that)
 {
-	int gcd = GCD(this->denom, that.denom);
-	
-	this->num *= gcd;
-	this->denom *= gcd;
-	that.num *= gcd;
-	that.denom *= gcd;
+	if (this->denom == 1 && that.denom == 1)
+	{
+		this->num += that.num;
+	} else if (this-> num == 0)
+	{
+		this->num = that.num;
+		this->denom = that.denom;
+	} else
+	{
+		this->num *= that.denom;
+		that.num *= this->denom;
+		this->num += that.num;
+		this->denom *= that.denom;
 
-	this->num += that.num;
-	this->denom += that.denom;
+	}
 
 	simplify();
 	set_print();
@@ -109,18 +113,41 @@ void Fraction::add(Fraction that)
 
 void Fraction::subtract(Fraction that)
 {
-	int gcd = GCD(this->denom, that.denom);
-	
-	this->num *= gcd;
-	this->denom *= gcd;
-	that.num *= gcd;
-	that.denom *= gcd;
+	if (this->denom == 1 && that.denom == 1)
+	{
+		this->num -= that.num;
 
-	this->num -= that.num;
-	this->denom -= that.denom;
+	} else if (this-> num == 0)
+	{
+		this->num = that.num;
+		this->denom = that.denom;
+
+	} else
+	{
+		this->num *= that.denom;
+		that.num *= this->denom;
+		this->num -= that.num;
+
+		this->denom *= that.denom;
+
+	}
 
 	simplify();
 	set_print();
 
+
 }
 
+Fraction Fraction::multiply_val(Fraction that)
+{
+	int new_num = this->num;
+	int new_denom = this->denom;
+
+	new_num *= that.num;
+	new_denom *= that.denom;
+
+	Fraction new_fraction(new_num, new_denom);
+
+	return new_fraction;
+	
+}

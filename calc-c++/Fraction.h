@@ -25,6 +25,8 @@ class Fraction
 		void add(Fraction that);
 		void subtract(Fraction that);
 		
+		Fraction multiply_val(Fraction that);
+
 		Fraction(int num);	
 		Fraction(int num, int denom);
 		

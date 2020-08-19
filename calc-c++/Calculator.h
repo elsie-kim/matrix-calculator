@@ -5,28 +5,25 @@
 #include <string>
 #include <iostream>
 #include <math.h>
+#include "Fraction.h"
 
 // Calculator object contains vector operation methods (such as dot product)
 
 class Calculator 
 {
-	std::string int_or_float(float x);  
-	std::string concatenate(std::string x);
-	std::string round_val(std::string x);
-
-	void print_vector(std::vector<float> v);
-	void swap(std::vector<float>& a, std::vector<float>& b);
-	void divide_row(std::vector<float>& a, float val);
-	void eliminate_row(std::vector<float>& a, std::vector<float>& pivot, float val);
+	void print_vector(std::vector<Fraction> v);
+	void swap(std::vector<Fraction>& a, std::vector<Fraction>& b);
+	void divide_row(std::vector<Fraction>& a, Fraction val);
+	void eliminate_row(std::vector<Fraction>& a, std::vector<Fraction>& pivot, Fraction val);
 
 	public:
-		float dot_product(std::vector<float>& v, std::vector<float>& v2);
-		std::string cross_product(std::vector<float>&v, std::vector<float>& v2);
+		std::string dot_product(std::vector<Fraction>& v, std::vector<Fraction>& v2);
+		std::string cross_product(std::vector<Fraction>&v, std::vector<Fraction>& v2);
 		
-		std::string multiplication(std::vector<std::vector<float>>& m1, std::vector<std::vector<float>>& m2);	
-		std::string augmented_reduced_row_echelon(std::vector<std::vector<float>>& m);
-		std::string addition(std::vector<std::vector<float>>& m1, std::vector<std::vector<float>>& m2);
-		std::string subtraction(std::vector<std::vector<float>>& m1, std::vector<std::vector<float>>& m2);
+		std::string multiplication(std::vector<std::vector<Fraction>>& m1, std::vector<std::vector<Fraction>>& m2);	
+		std::string augmented_reduced_row_echelon(std::vector<std::vector<Fraction>>& m);
+		std::string addition(std::vector<std::vector<Fraction>>& m1, std::vector<std::vector<Fraction>>& m2);
+		std::string subtraction(std::vector<std::vector<Fraction>>& m1, std::vector<std::vector<Fraction>>& m2);
 
 };
 

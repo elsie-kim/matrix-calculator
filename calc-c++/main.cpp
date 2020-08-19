@@ -2,7 +2,6 @@
 #include <vector>
 #include <type_traits>
 #include "Calculator.h"
-#include "Fraction.h"
 
 void print_vector(std::vector<Fraction> v){
 	for (Fraction f : v) 
@@ -224,17 +223,15 @@ int main(int argc, char* argv[])
 	if (x.compare("-v") == 0)
 	{
 		std::vector<std::vector<Fraction>> vectors = vector_handler(argc, argv);
-        	print_vector(vectors[0]);
+        	switch(operation) {
+			case 0:
+                		std::cout << calc.dot_product(vectors[0], vectors[1]) << std::endl;
+				break;
 
-        	//switch(operation) {
-		//	case 0:
-                //		std::cout << calc.dot_product(vectors[0], vectors[1]) << std::endl;
-		//		break;
-
-		//	case 1:
-		//		std::cout << calc.cross_product(vectors[0], vectors[1]) << std::endl;
-		//		break;
-        	//}
+			case 1:
+				std::cout << calc.cross_product(vectors[0], vectors[1]) << std::endl;
+				break;
+        	}
         
     	} else // "-m" for matrix
 	{

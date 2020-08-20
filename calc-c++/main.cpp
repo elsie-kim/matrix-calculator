@@ -243,21 +243,19 @@ int main(int argc, char* argv[])
 		{
 			case 0:
 				matrices = matrices_handler(argc, argv);
-				print_matrix(matrices[0]);
-				//std::cout << calc.multiplication(matrices[0], matrices[1]) << std::endl;
+				std::cout << calc.multiplication(matrices[0], matrices[1]) << std::endl;
 				break;
 			case 1:
 				matrix = matrix_handler(argc, argv);
-				print_matrix(matrix);
-				//std::cout << calc.augmented_reduced_row_echelon(matrix);
+				std::cout << calc.augmented_reduced_row_echelon(matrix);
 				break;
 			case 2:
 				matrices = matrices_handler(argc, argv);
-				//std::cout << calc.addition(matrices[0], matrices[1]);
+				std::cout << calc.addition(matrices[0], matrices[1]);
 				break;
 			case 3:
 				matrices = matrices_handler(argc, argv);
-				//std::cout << calc.subtraction(matrices[0], matrices[1]);
+				std::cout << calc.subtraction(matrices[0], matrices[1]);
 				break;	
 
 		}

@@ -47,15 +47,15 @@ void Calculator::print_vector(std::vector<Fraction> v)
 // multiplies two matrices
 std::string Calculator::multiplication(std::vector<std::vector<Fraction>>& m1, std::vector<std::vector<Fraction>>& m2) 
 {
-	std::string ans = "\n";
-
+	std::string ans = "";
+	std::vector<Fraction> b;
+	
 	// use the dot_product() method to find each component of the product
 	for (std::vector<Fraction> a : m1) {
 		for (int i=0; i<m2[0].size(); i++) {
-			std::vector<Fraction> b;
+			b.clear();	
 			for (int j=0; j<m2.size(); j++) {
 				b.push_back(m2[j][i]);
-	
 			}
 			
 			ans += dot_product(a, b) + " ";
@@ -65,7 +65,7 @@ std::string Calculator::multiplication(std::vector<std::vector<Fraction>>& m1, s
 	}
 
 	return ans;
-
+	
 }
 
 // swap two rows in a 2D vector
@@ -95,6 +95,7 @@ void Calculator::eliminate_row(std::vector<Fraction>& a, std::vector<Fraction>& 
 	}
 }
 
+// formats matrix vector to a printable form
 std::string format_matrix(std::vector<std::vector<Fraction>>& m)
 {
 	// format answer
@@ -112,6 +113,7 @@ std::string format_matrix(std::vector<std::vector<Fraction>>& m)
 	return result;
 }
 
+// checks bottom row for zeros
 int check_bottom_row(std::vector<std::vector<Fraction>>& m)
 {
 	int rows = m.size()-1;
@@ -131,63 +133,137 @@ int check_bottom_row(std::vector<std::vector<Fraction>>& m)
 		return 0; // has more than one non-zero element and the last element is not 0
 }
 
-// produces an augmented matrix in reduced row echelon form (if possible) using Gaussian elimination
-std::string Calculator::augmented_reduced_row_echelon(std::vector<std::vector<Fraction>>& m)
+// finds the next non-zero element in a row
+int Calculator::find_next_column(std::vector<std::vector<Fraction>>& m, int current)
 {
-	std::cout << "hello\n";
-	if (m.size() > m[0].size())
+	for (int i=0; i < m[0].size(); i++)
 	{
-		return "Check dimensions";
+		if (m[current][i].print != "0")
+			return i;
+	}
+	return -1;
+}
+
+// moves an all-zero or mostly-zero row to the bottom and shifts the other rows up
+void Calculator::move_to_back(std::vector<std::vector<Fraction>>& m, int row)
+{
+	std::vector<Fraction> temp = m[row];
+	
+	for (int i=row; i < m.size()-1; i++)
+	{
+		m[i] = m[i+1];
 	}
 
-	int count;
+	m[m.size()-1] = temp;
+}
 
+// swaps rows to keep them in order
+void Calculator::move_row(std::vector<std::vector<Fraction>>& m, int pivot)
+{
+	int col;
+	// Move the next left-most non-zero element to current row
+	for (int i=0; i < m.size(); i++)
+	{	
+		col = find_next_column(m, i);
+		if (col < pivot && col != -1)
+		{
+			pivot = find_next_column(m, i);
+
+			if (i > 0)
+				swap(m[0], m[i]);
+
+		} else if (col == -1) {
+			if (i != m.size()-1)
+				move_to_back(m, i);	
+		} 
+	}
+
+}
+
+// produces an augmented matrix in reduced row echelon form (if possible) using Gaussian elimination
+// * returns result as a string
+std::string Calculator::augmented_reduced_row_echelon(std::vector<std::vector<Fraction>>& m)
+{
+	int pivot = m[0].size()-2;
+
+	int col;
+	
+	
 	for (int i=0; i < m.size(); i++)
 	{
-		// moving rows if the pivot element is 0
-		if (m[i][i].print == "0")
+		move_row(m, pivot);
+		pivot = find_next_column(m, i);
+
+		if (pivot != -1)
 		{
-			// don't swap rows if this is the last row
-			if (i == m.size()-1) 
-			{
-				int check = check_bottom_row(m);
-				if (check == 1) return format_matrix(m);
-				else if (check == 2) return "Inconsistent system";
-				else break;
-
-			} else swap(m[i], m[i+1]);
-
-			std::cout << "swapped or last row\n" << format_matrix(m) << std::endl;
+			divide_row(m[i], m[i][pivot]);
+		} else { // if the row is all 0s
+			return format_matrix(m);
 		}
-
-		// divide row to make pivot element 1
-		divide_row(m[i], m[i][i]);
 		
-		// makes corresponding elements in latter columns 0
-		std::cout << "divided\n" << format_matrix(m) << std::endl;
-
-		for (int j=i+1; j < m.size(); j++) 
+		// eliminate rows below
+		for (int j=i+1; j < m.size(); j++)
 		{
-			eliminate_row(m[j], m[i], m[j][i]);
-
-			std::cout << "1st elim\n" << format_matrix(m) << std::endl;
+			eliminate_row(m[j], m[i], m[j][pivot]);
 		}
-
+		
+		// eliminate rows above
 		if (i > 0)
 		{
 			for (int j=i-1; j >= 0; j--)
 			{
-				eliminate_row(m[j], m[i], m[j][i]);
-
-				std::cout << "2nd elim\n" << format_matrix(m) << std::endl;
+				eliminate_row(m[j], m[i], m[j][pivot]);
 			}
 		}
+		std::cout << format_matrix(m) << "\n";
 
 	}
 
-
 	return format_matrix(m);
 }
+
+// produces an augmented matrix in reduced row echelon form (if possible) using Gaussian elimination
+// * returns result as a vector
+std::vector<std::vector<Fraction>> Calculator::augmented_reduced_row_echelon_solve(std::vector<std::vector<Fraction>>& m)
+{
+	int pivot = m[0].size()-2;
+
+	int col;
+	
+	
+	for (int i=0; i < m.size(); i++)
+	{
+		move_row(m, pivot);
+		pivot = find_next_column(m, i);
+
+		if (pivot != -1)
+		{
+			divide_row(m[i], m[i][pivot]);
+		} else { // if the row is all 0s
+			return m;
+		}
+		
+		// eliminate rows below
+		for (int j=i+1; j < m.size(); j++)
+		{
+			eliminate_row(m[j], m[i], m[j][pivot]);
+		}
+		
+		// eliminate rows above
+		if (i > 0)
+		{
+			for (int j=i-1; j >= 0; j--)
+			{
+				eliminate_row(m[j], m[i], m[j][pivot]);
+			}
+		}
+		std::cout << format_matrix(m) << "\n";
+
+	}
+
+	return m;
+}
+
 
 // adds two matrices
 std::string Calculator::addition(std::vector<std::vector<Fraction>>& m1, std::vector<std::vector<Fraction>>& m2) 
@@ -228,19 +304,3 @@ std::string Calculator::subtraction(std::vector<std::vector<Fraction>>& m1, std:
 
 	return format_matrix(result);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

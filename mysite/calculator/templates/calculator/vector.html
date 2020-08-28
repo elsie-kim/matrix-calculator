@@ -30,7 +30,7 @@
 						},
 						dataType: 'json',
 						success: function(data){
-							handleValidationResult(data.is_valid, data.v1_clean, data.v2_clean, data.operation, data.message);
+							handleValidationResult(data.is_valid, data.v1, data.v2, data.operation, data.message);
 
 						}
 					});
@@ -46,7 +46,7 @@
 			function handleValidationResult(is_valid, v1, v2, operation, message) {
 				// checks if user's input was deemed valid by validate() in Django views.py
 				if (is_valid == "1") {			
-					//send ajax request to vector() in views
+					//send ajax request to calculate_vector() in views
 					$.ajax({
 						type: 'GET',
 						url: '/vector/calculate/',

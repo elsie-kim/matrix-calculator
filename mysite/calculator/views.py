@@ -3,7 +3,10 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 import subprocess, os
 
-from .forms import VectorForm, MatrixForm
+from .forms import VectorForm, MatrixForm, SingleMatrixForm
+from .utils.vector_utils import validate_vector_v, format_input_v, format_output_v
+from .utils.matrix_utils import validate_matrix_m, format_input_m, format_output_m
+from .utils.single_matrix_utils import validate_matrix_sm, format_input_sm, format_output_sm
 
 # Create your views here.
 # Front page
@@ -27,134 +30,29 @@ def vector(request):
     return render(request, 'calculator/vector.html', context)
 
 def validate_vector(request):
-    # cleans up user input and determines if the user's input is useable
-    def validate_vector(v):
-        # removing any white space at the beginning
-        start = 0
-        for i in v:
-            if i == " ":
-                start += 1
-            else:
-                break
-        
-        v = v[start:]
-        
-        # return empty list to indicate empty input
-        if v == "":
-            return ""
-
-        elif v[0] == '(' and v[-1] == ')':
-            # remove parentheses
-            v_split = v[1:-1]
-           
-            # remove spaces
-            v_split = v_split.split(' ')
-            v_split_2 = "" 
-            
-            # remove commas and any non-numerical characters
-            for i in v_split:
-                x = i.split(',')
-            
-                for j in x:
-                    try:
-                        # finding non-numerical characters
-                        j = float(j)
-        
-                        # add to new string which holds the "cleaned" input
-                        v_split_2 += str(j) + " "
-                
-                    except:
-                        if j != "":
-                            return j
-                        else:
-                            pass
-            # return list of components
-            return v_split_2 
-
-        else:
-            pass
-            # return empty list to indicate that the user's input is not useable
-            return ""
-    
+#    # cleans up user input and determines if the user's input is useable
     # response to AJAX call sent by pressing "Enter"
-    try: #try/except necessary?
+   
         # getting user's inputs from "Vector 1" and "Vector 2"
-        v1 = request.GET['v1']
-        v2 = request.GET['v2']
-        operation = request.GET['operation']
- 
-        # receive "cleaned" or empty list
-        v1_clean = validate_vector(v1)
-        v2_clean = validate_vector(v2)
-        
-        # validate user input
-        if v1_clean != "" and v2_clean != "" and len(v1_clean.split(" ")) == len(v2_clean.split(" ")):
-            if operation == "1":
-                if len(v1_clean.split(" ")) == 4:
-                    is_valid = 1
-                    message = ""
-                else:
-                    is_valid = 0
-                    message = "The cross product is limited to 3D vectors"
-            else:
-                is_valid = 1
-                message = ""
-
-        else:
-            is_valid = 0
-            message = "Invalid input"
-        
-        data = {
-            'is_valid': str(is_valid),
-            'v1_clean': v1_clean,
-            'v2_clean': v2_clean,
-            'operation' : str(operation),
-            'message': message,
-        }
-
-    except:
-        pass
+    v1 = request.GET.get('v1')
+    v2 = request.GET.get('v2')
+    operation = request.GET.get('operation')
     
+    data = validate_vector_v(v1, v2, operation)
+ 
     # send back for AJAX to handle
     return JsonResponse(data)
 
 def calculate_vector(request):
-    v1 = request.GET['v1']
-    v2 = request.GET['v2']
-    operation = request.GET['operation']
+    v1 = request.GET.get('v1')
+    v2 = request.GET.get('v2')
+    operation = request.GET.get('operation')
     
-    input_cmd = ['./a.out', '-v', operation, '-v1']
-
-    def format_input(v1, v2):
-        v1 = v1.split(" ")
-        v2 = v2.split(" ")
-
-        for i in v1: # fit into one loop?
-            if i != "":
-                input_cmd.append(i)
-        
-        input_cmd.append("-v2")
-
-        for i in v2:
-            if i != "":
-                input_cmd.append(i)
-
+    input_cmd = format_input_v(v1, v2, operation)
     
     os.chdir("/home/elsie/calculator/matrix-calculator/calc-c++/")
-    format_input(v1, v2)
 
-    answer = subprocess.check_output(input_cmd)
-
-    # format as a scalar value if dot product
-    if operation == "0":
-        # return int if answer is int, float if answer is float 
-        try:
-            answer = str(int(answer))
-        except:
-            answer = str(float(answer))
-    else:
-        answer = str(answer)
-        answer = answer[2:-3]
+    answer = format_output_v(subprocess.check_output(input_cmd))
 
     data = {
         'answer': answer
@@ -176,158 +74,68 @@ def matrix(request):
 # determins whether user's input is useable or not
 def validate_matrix(request):
     m1 = request.GET.get('m1')
-    operation = request.GET['operation']
+    m2 = request.GET.get('m2')
+    operation = request.GET.get('operation')
 
-    m1_clean = ""
-    m1_split = m1.splitlines()
-    # split chunk of text into lines
-    m1_split = m1.splitlines()
-
-    is_valid = 2
-    message = ""
-
-    if operation != "1":
-        m2 = request.GET.get('m2')
-        m2_clean = ""
-        
-        try:
-            m2_split = m2.splitlines()
-        except:
-            pass
-
-    # split lines into individual components
-    # and add "-n" to indicate a new line, so that main.cpp
-    # can process the string and split into 2D vectors
-    for i in range(len(m1_split)-1):
-        x = m1_split[i].split()
-        y = m1_split[i+1].split()
-
-        a = [i.strip(" ") for i in x]
-        b = [i.strip(" ") for i in y]
-        
-        # for a matrix, each row must be of equal dimension
-        if len(a) != len(b):
-            is_valid = 0
-            message = "Rows must be equal in dimension"
-            break
-       
-        # for matrix A of dimensions (m x n) and matrix B of dimensions (p x q),
-        # n must be equal to p in order for multiplication to be a valid
-        # operation
-        elif operation == "0" and len(m1_split) != len(b):
-            is_valid = 0
-            message = "The number of columns of matrix 1 must match the number of rows of matrix 2"
-            break
-
-        else:
-            is_valid = 1
-    
-    if is_valid == 1:
-        for i in m1.splitlines():
-            m1_clean += "-n "
-            for j in i.split(" "):
-                try:
-                    j = float(j)
-                    m1_clean += str(j) + " "
-
-                except:
-                    if j!= " " or j!= "":
-                        is_valid = 0
-                        break
-        
-        if operation != "1":
-            for i in range(len(m2_split)-1):
-                x = m2_split[i].split()
-                y = m2_split[i+1].split()
-
-                a = [i.strip(" ") for i in x]
-                b = [i.strip(" ") for i in y]
-
-
-                if len(a) != len(b):
-                    is_valid = 0
-                    break
-                else:
-                    is_valid = 1
-
-            if (is_valid == 1):
-
-    #            for i in m1.splitlines():
-    #                m1_clean += "-n "
-    #                for j in i:
-    #                    try:
-    #                        j = float(j)
-    #                        m1_clean += str(j) + " "
-    #
-    #                    except:
-    #                        if j!= " ":
-    #                            is_valid = 0
-    #                            break
-    #
-                for i in m2.splitlines():
-                    m2_clean += "-n "
-                    
-                    for j in i.split(" "):
-                        try:
-                            j = float(j)
-                            m2_clean += str(j) + " "
-                        
-                        except:
-                            if j != " ":
-                                is_valid = 0
-                                break
-    
-    data = {
-        'is_valid': is_valid,
-        'm1': m1_clean,
-        'operation': operation,
-        'message': message,
-    }
-    
-    if operation != "1":
-        data['m2'] = m2_clean
+    data = validate_matrix_m(m1, m2, operation)
     
     return JsonResponse(data)
 
 def calculate_matrix(request):
-    m1 = request.GET['m1']
-    operation = request.GET['operation']
+    m1 = request.GET.get('m1')
+    m2 = request.GET.get('m2')
+    operation = request.GET.get('operation')
     
-    input_cmd = ['./a.out', '-m', operation]
-
-    if operation != "1":
-        m2 = request.GET['m2']
-
-        input_cmd.append('-m1')
-
-        for i in m1.split(" "):
-            if i != "":
-                input_cmd.append(i)
-
-        input_cmd.append('-m2')
-
-        for i in m2.split(" "):
-            if i != "":
-                input_cmd.append(i)
-
-    else:
-        for i in m1.split(" "):
-            if i != "":
-                input_cmd.append(i)
-
+    input_cmd = format_input_m(m1, m2, operation)
+    print(input_cmd) 
     os.chdir("/home/elsie/calculator/matrix-calculator/calc-c++/")
 
     out = subprocess.Popen(input_cmd, stdout=subprocess.PIPE)
     output = out.stdout.readlines()
     
-    answer = ""
-
-    for i in output:
-        answer += str(i)[2:-3] + "-n "
+    answer = format_output_m(output)
 
     data = {
         'answer': answer,
     }
     
+    return JsonResponse(data)
+
+def single_matrix(request):
+    try:
+        form = SingleMatrixForm()
+
+    except:
+        pass
+
+    context = {'form': form}
+
+    return render(request, 'calculator/single_matrix.html', context)
+
+def validate_single_matrix(request):
+    m = request.GET.get('m')
+    operation = request.GET.get('operation')
+
+    data = validate_matrix_sm(m, operation)
+
+    return JsonResponse(data)
+
+def calculate_single_matrix(request):
+    m = request.GET.get('m')
+    operation = request.GET.get('operation')
+
+    input_cmd = format_input_sm(m, operation)
+    
+    os.chdir("/home/elsie/calculator/matrix-calculator/calc-c++/")
+
+    out = subprocess.Popen(input_cmd, stdout=subprocess.PIPE)
+    output = out.stdout.readlines()
+
+    answer = format_output_sm(output)
+
+    data = {
+        'answer': answer,
+    }
+
     return JsonResponse(data)
 

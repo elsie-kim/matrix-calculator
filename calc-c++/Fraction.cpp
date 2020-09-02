@@ -141,7 +141,7 @@ void Fraction::subtract(Fraction that)
 
 	} else if (this-> num == 0)
 	{
-		this->num = that.num;
+		this->num = -1 * that.num;
 		this->denom = that.denom;
 
 	} else
@@ -174,5 +174,13 @@ Fraction Fraction::multiply_val(Fraction that)
 
 	return new_fraction;
 	
+}
+
+void Fraction::multiply_by_val(int val)
+{
+	this->num *= val;
+
+	simplify();
+	set_print();
 }
 

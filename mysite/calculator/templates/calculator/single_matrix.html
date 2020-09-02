@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+	{% block content %}
+		<h>Matrix Solving Calculator</h>
+		
+		<form id="single-matrix" method="GET">
+			{% csrf_token %}
+			{{ form.as_p }}
+			<button type="submit" id = "matrix-submit">Enter</button>
+		</form>
+
+		<p id="message"></p>
+
+		<script type="text/javascript">
+			document.getElementById("matrix-submit").addEventListener("click", matrixInput);
+
+			function matrixInput(e) {
+				$(document).on('submit', '#single-matrix', function(e){
+					e.preventDefault();
+					
+					$.ajax({
+						type: 'GET',
+						url: '/single-matrix/validate/',
+						data: {
+							'm': document.getElementById('id_matrix').value,
+							'operation': document.getElementById('id_operation').value,
+							csrfmiddlewaretoken: '{{ csrf_token }}',
+					
+						},
+						dataType: 'json',
+						success: function(data){
+							handleValidationResult(data.is_valid, data.m, data.operation, data.message);
+						}
+					});
+				});
+			}
+
+			function handleValidationResult(is_valid, m, operation, message) {
+				if (is_valid == "1") {
+					$.ajax({
+						type: 'GET',
+						url: '/single-matrix/calculate/',
+						data: {
+							'm': m,
+							'operation': operation,
+							csrfmiddlewaretoken: '{{ csrf_token }}',
+						},
+						dataType: 'json',
+						success: function(data){
+							var ans = data.answer.split('-n');
+
+							var ans_formatted = '';
+
+							for (var i=0; i<ans.length; i++) {
+								if (ans[i] != '')
+									ans_formatted = ans_formatted.concat(ans[i], '<br>');
+							}
+							
+							document.getElementById('message').innerHTML = ans_formatted;
+						}
+					});
+				} else {
+					document.getElementById('message').innerHTML = message;
+				}
+			}
+	
+		</script>
+
+	{% endblock %}	

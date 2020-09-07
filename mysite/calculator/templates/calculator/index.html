@@ -1,8 +1,45 @@
-<!DOCTYPE HTML>
-<html>
-	<h1>Hello! Welcome to the Online Vector and Matrix Calculator!</h1>
-	<a href="{% url 'vector' %}">Vector Calculator</a><br>
-	<a href="{% url 'matrix' %}">Matrix Calculator</a><br>
-	<a href="{% url 'single_matrix' %}">Matrix Solver</a><br>
-	<a href="{% url 'help' %}">How to Use this Calculator</a>
-</html>
+{% extends 'base.html' %}
+	{% block content %}
+	
+	<div class="centerblock" style="padding-bottom: 10px;padding-top: 20px;">
+	<div class="row justify-content-center">
+		<h1>Welcome to the Online Vector and Matrix Calculator.</h1>
+	</div></div>
+	<br><br>
+	<div class="row justify-content-center">
+	<div class="col-md-5">
+		<div class="card">
+		<div class="card-body">
+			<h5 class="card-title">Vector Calculator</h5>
+			<p class="card-text">Use this vector calculator to find the dot product or cross product of two vectors.</p>
+			<a href="/vector/" class="btn btn-outline-secondary">Go to Vector Calculator</a>
+		</div></div>
+	</div>
+	<div class="col-md-5">
+		<div class="card">
+		<div class="card-body">
+			<h5 class="card-title">Matrix Calculator</h5>
+			<p class="card-text">This matrix calculator includes multiplication, addition, and subtraction.</p>
+			<a href="/matrix/" class="btn btn-outline-secondary">Go to Matrix Calculator</a>
+		</div></div>
+	</div></div>
+	<br><br>
+	<div class="row justify-content-center">
+	<div class="col-md-5">
+		<div class="card">
+		<div class="card-body">
+			<h5 class="card-title">Gauss-Jordan Elimination Calculator</h5>
+			<p class="card-text">Find the reduced row echelon form of a matrix, provided that it is a consistent system.</p>
+			<a href="/single-matrix/" class="btn btn-outline-secondary">Go to Gauss-Jordan Elimination Calculator</a>
+		</div></div>
+	</div>
+	<div class="col-md-5">
+		<div class="card">
+		<div class="card-body">
+			<h5 class="card-title">How to Use this Calculator</h5>
+			<p class="card-text">Learn how to use this calculator and the details about how it was created.</p>
+			<a href="/help/" class="btn btn-outline-secondary">Help Page</a>
+		</div></div>
+	</div></div>
+
+	{% endblock %}

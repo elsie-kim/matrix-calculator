@@ -35,15 +35,6 @@ std::string Calculator::cross_product(std::vector<Fraction>&v1, std::vector<Frac
 	return ans;
 }
 
-void Calculator::print_vector(std::vector<Fraction> v)
-{
-	//for (Fraction a : v) {
-	//	std::cout << a << "\t";
-	//}
-	//std::cout << std::endl;
-
-}
-
 // multiplies two matrices
 std::string Calculator::multiplication(std::vector<std::vector<Fraction>>& m1, std::vector<std::vector<Fraction>>& m2) 
 {
@@ -215,7 +206,6 @@ std::string Calculator::augmented_reduced_row_echelon(std::vector<std::vector<Fr
 				eliminate_row(m[j], m[i], m[j][pivot]);
 			}
 		}
-		std::cout << format_matrix(m) << "\n";
 
 	}
 
@@ -257,7 +247,6 @@ std::vector<std::vector<Fraction>> Calculator::augmented_reduced_row_echelon_sol
 				eliminate_row(m[j], m[i], m[j][pivot]);
 			}
 		}
-		std::cout << format_matrix(m) << "\n";
 
 	}
 

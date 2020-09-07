@@ -1,16 +1,41 @@
 {% extends 'base.html' %}
 	{% block content %}
-		<h>Vector Calculator</h>
-		<form id="vector" method="GET">
-			{% csrf_token %}
-			{{ form.as_p }}
-			<button type="submit" id="vector-submit">Enter</button>
-		</form>
+		<div class="centerblock" style="padding-bottom: 10px;padding-top: 20px;">
+		<div class="row justify-content-center">
+			<h1>Vector Calculator</h1>
+		</div>
+		</div>
+		<div class="container mt-5">
+			<form id="vector" method="GET">
+				{% csrf_token %}
+			<div class="row justify-content-center">
+				<div class="form-group col-lg-5">
+				<label for="id_vector1" class="text-center">Vector A</label>
+				<input class="form-control form-control-lg" type="text" placeholder="Integers and fractions only. Ex. (1, -2/5, 3, ...)" name="v1" id="id_vector1" required><br>
+				</div>
+			</div><div class="row justify-content-center">
+				<div class="form-group col-lg-5">
+				<label for="id_vector2" class="text-center">Vector B</label>
+				<input class="form-control form-control-lg" type="text" placeholder="Integers and fractions only. Ex. (1, -2/5, 3, ...)" name="v2" id="id_vector2" required><br>
+				</div>
+			</div><div class="form-row justify-content-center">
+				<div class="form-group col-md-2 pb-2">
+				<label for="id_operation" class="text-center">Operation</label>
+				<select class="custom-select mr-sm-2" name="operation" id="id_operation" required>
+					<option value="0">Dot Product</option>
+					<option value="1">Cross Product</option>
+				</select>
+				</div>
+				<button type="submit" class="btn btn-lg btn-outline-secondary mt-4 mb-2 ml-5" id="vector-submit">Enter</button>
+				<input type="reset" class="btn btn-lg btn-outline-secondary mt-4 mb-2 ml-4" value="Reset" id="reset">
+				</div></div>
+			</form>
+		</div>
 		
-		<body>
-			<p id="message"></p>
-		</body>
-		
+		<p class="text-center mt-5" id="message"></p>
+
+		</div>
+
 		<script type="text/javascript">
 			// listens for "Enter" button
 			document.getElementById("vector-submit").addEventListener("click", vectorInput);

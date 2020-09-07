@@ -1,18 +1,34 @@
 {% extends 'base.html' %}
 	{% block content %}
-		<h>Matrix Solving Calculator</h>
+		<div class="centerblock" style="padding-bottom: 10px; padding-top: 20px;">
+		<div class="row justify-content-center">
+			<h1>Reduced Row Echelon Form (Gaussian-Jordan Elimination)</h1>
+		</div></div>
 		
+		<div class="container mt-5">
 		<form id="single-matrix" method="GET">
 			{% csrf_token %}
-			{{ form.as_p }}
-			<button type="submit" id = "matrix-submit">Enter</button>
+			<div class="row justify-content-center">
+				<div class="form-group">
+				<label for="id_matrix" class="text-center">Matrix A</label><br>
+				<textarea name="m" id="id_matrix" cols="44" rows="7" required></textarea>
+				</div>
+
+			</div>
+			<div class="row justify-content-center">	
+			<button type="submit" class="btn btn-lg btn-outline-secondary mt-4 mb-2 ml-4" id="matrix-submit">Enter</button>
+			<button type="reset" class="btn btn-lg btn-outline-secondary mt-4 mb-2 ml-4" id="matrix-reset">Reset</button>
+			</div>
 		</form>
 
-		<p id="message"></p>
+		<p class="text-center mt-5 mb-5" id="message"></p>
+
+		</div>
 
 		<script type="text/javascript">
 			document.getElementById("matrix-submit").addEventListener("click", matrixInput);
-
+			
+			// send ajax call to validate user input
 			function matrixInput(e) {
 				$(document).on('submit', '#single-matrix', function(e){
 					e.preventDefault();
@@ -22,33 +38,32 @@
 						url: '/single-matrix/validate/',
 						data: {
 							'm': document.getElementById('id_matrix').value,
-							'operation': document.getElementById('id_operation').value,
 							csrfmiddlewaretoken: '{{ csrf_token }}',
 					
 						},
 						dataType: 'json',
 						success: function(data){
-							handleValidationResult(data.is_valid, data.m, data.operation, data.message);
+							handleValidationResult(data.is_valid, data.m, data.message);
 						}
 					});
 				});
 			}
-
-			function handleValidationResult(is_valid, m, operation, message) {
+			
+			// if user input is valid, send validated data to c++ file
+			function handleValidationResult(is_valid, m, message) {
 				if (is_valid == "1") {
 					$.ajax({
 						type: 'GET',
 						url: '/single-matrix/calculate/',
 						data: {
 							'm': m,
-							'operation': operation,
 							csrfmiddlewaretoken: '{{ csrf_token }}',
 						},
 						dataType: 'json',
 						success: function(data){
 							var ans = data.answer.split('-n');
 
-							var ans_formatted = '';
+							var ans_formatted = "Answer: <br>";
 
 							for (var i=0; i<ans.length; i++) {
 								if (ans[i] != '')

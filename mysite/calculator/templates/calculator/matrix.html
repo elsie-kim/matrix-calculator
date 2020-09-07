@@ -1,17 +1,47 @@
 {% extends 'base.html' %}
 	{% block content %}
-		<h>Matrix Calculator</h>
+		<div class="centerblock" style="padding-bottom: 10px;padding-top: 20px;">
+		<div class="row justify-content-center">
+			<h1>Matrix Calculator</h1>
+		</div></div>
+
+		<div class="container mt-5">
 		<form id="matrix" method="GET">
 			{% csrf_token %}
-			{{ form.as_p }}
-			<button type="submit" id="matrix-submit">Enter</button>
+			<div class="row justify-content-center">
+				<div class="form-group">
+				<label for="id_matrix1" class="text-center">Matrix A</label><br>
+				<textarea name="m1" id="id_matrix1" cols="44" rows="5" required></textarea><br>
+				</div> 
+			</div>
+			<div class="row justify-content-center">
+				<div class="form-group">
+					<label for"id_matrix2" class="text-center">Matrix B</label><br>
+				<textarea name="m2" id="id_matrix2" cols="44" rows="5" required></textarea><br>
+				</div>
+			</div>
+			<div class="row justify-content-center">
+				<div class="form-group col-md-2 pb-2">
+				<label for="id_operation" class="text-center">Operation</label>
+				<select class="custom-select mr-sm-2" name="operation" id="id_operation" required>
+					<option value="0">Multiplication</option>
+					<option value="1">Addition</option>
+					<option value="2">Subtraction</option>
+				</select>
+				</div>
+			<button type="submit" class="btn btn-lg btn-outline-secondary mt-4 mb-2 ml-4" id="matrix-submit">Enter</button>
+			<button type="reset" class="btn btn-lg btn-outline-secondary mt-4 mb-2 ml-4" id="matrix-reset">Reset</button>
+			</div>
 		</form>
-	
-		<p id ="message"></p>
-	
+			
+		<p class="text-center mt-5 mb-5" id ="message"></p>
+
+		</div>
+
 		<script type="text/javascript">
 			document.getElementById("matrix-submit").addEventListener("click", matrixInput);
-
+			
+			// send ajax call to validate data using python util files
 			function matrixInput(e) {
 				$(document).on('submit', '#matrix', function(e){
 					e.preventDefault();
@@ -33,6 +63,7 @@
 				});
 			}
 
+			// if user input was deemed valid, an ajax call is received by the python view to be sent to a c++ file
 			function handleValidationResult(is_valid, m1, m2, operation, message) {
 				if (is_valid == "1") {
 					$.ajax({
@@ -48,7 +79,7 @@
 						success: function(data){
 							var ans = data.answer.split('-n');
 
-							var ans_formatted = '';
+							var ans_formatted = "Answer: <br>";
 
 							for (var i=0; i < ans.length; i++) {
 								if (ans[i] != '' && ans[i] != ' ') {

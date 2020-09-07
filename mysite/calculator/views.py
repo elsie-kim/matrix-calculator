@@ -1,55 +1,60 @@
-from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, JsonResponse
+from django.shortcuts import render
+from django.http import  JsonResponse
 from django.contrib import messages
 import subprocess, os
 
-from .forms import VectorForm, MatrixForm, SingleMatrixForm
 from .utils.vector_utils import validate_vector_v, format_input_v, format_output_v
 from .utils.matrix_utils import validate_matrix_m, format_input_m, format_output_m
 from .utils.single_matrix_utils import validate_matrix_sm, format_input_sm, format_output_sm
 
-# Create your views here.
-# Front page
+# Views
+
+# '/' page
 def index(request):
     return render(request, 'calculator/index.html')
 
-# Help page
+# '/help/' page
 def help(request):
-    return HttpResponse("Hi, welcome to the help page.")
+    return render(request, 'calculator/help.html')
 
-# Vector page
+# '/vector/' page
 def vector(request):
-    # handle when page is first accessed/reloaded
     try:
-        form = VectorForm()
-    except:
-        pass
+        form = request.GET
+        v1 = form['v1']
+        v2 = form['v2']
+        operation = form['operation']
 
-    context = {'form' : form}
+        context = {
+            'v1': v1,
+            'v2': v2,
+            'operation': operation,
+        }
+
+    except:
+        context = {}
 
     return render(request, 'calculator/vector.html', context)
 
+# cleans up user input and determines if it is useable
 def validate_vector(request):
-#    # cleans up user input and determines if the user's input is useable
-    # response to AJAX call sent by pressing "Enter"
-   
-        # getting user's inputs from "Vector 1" and "Vector 2"
+    # getting user's inputs from "Vector A", "Vector B", and "Operation"
     v1 = request.GET.get('v1')
     v2 = request.GET.get('v2')
     operation = request.GET.get('operation')
     
     data = validate_vector_v(v1, v2, operation)
  
-    # send back for AJAX to handle
+    # send back for AJAX calls to handle
     return JsonResponse(data)
 
+# sends cleaned user input to c++ program to be calculated
 def calculate_vector(request):
     v1 = request.GET.get('v1')
     v2 = request.GET.get('v2')
     operation = request.GET.get('operation')
     
-    input_cmd = format_input_v(v1, v2, operation)
-    
+    input_cmd = format_input_v(v1, v2, operation) 
     os.chdir("/home/elsie/calculator/matrix-calculator/calc-c++/")
 
     answer = format_output_v(subprocess.check_output(input_cmd))
@@ -60,18 +65,26 @@ def calculate_vector(request):
 
     return JsonResponse(data)
 
-# 'matrix/' page
+# '/matrix/' page
 def matrix(request):
     try:
-        form = MatrixForm()
-    except:
-        pass
+        form = request.GET
+        m1 = form['m1']
+        m2 = form['m2']
+        operation = form['operation']
 
-    context = {'form' : form}
+        context = {
+            'm1': m1,
+            'm2': m2,
+            'operation': operation,
+        }
+
+    except:
+        context = {}
     
     return render(request, 'calculator/matrix.html', context)
 
-# determins whether user's input is useable or not
+# cleans up user input and determines if it is useable
 def validate_matrix(request):
     m1 = request.GET.get('m1')
     m2 = request.GET.get('m2')
@@ -81,13 +94,13 @@ def validate_matrix(request):
     
     return JsonResponse(data)
 
+# sends cleaned user input to c++ program to be calculated
 def calculate_matrix(request):
     m1 = request.GET.get('m1')
     m2 = request.GET.get('m2')
     operation = request.GET.get('operation')
     
     input_cmd = format_input_m(m1, m2, operation)
-    print(input_cmd) 
     os.chdir("/home/elsie/calculator/matrix-calculator/calc-c++/")
 
     out = subprocess.Popen(input_cmd, stdout=subprocess.PIPE)
@@ -101,31 +114,34 @@ def calculate_matrix(request):
     
     return JsonResponse(data)
 
+# '/single-matrix/' page
 def single_matrix(request):
     try:
-        form = SingleMatrixForm()
+        form = request.GET
+
+        m = form['m']
+
+        context = {
+            'm': m,
+        }
 
     except:
-        pass
-
-    context = {'form': form}
+        context = {}
 
     return render(request, 'calculator/single_matrix.html', context)
 
+# cleans user input and determines if it is usable
 def validate_single_matrix(request):
     m = request.GET.get('m')
-    operation = request.GET.get('operation')
 
-    data = validate_matrix_sm(m, operation)
-
+    data = validate_matrix_sm(m)
     return JsonResponse(data)
 
+# sends cleaned user input to c++ program to be calculated
 def calculate_single_matrix(request):
     m = request.GET.get('m')
-    operation = request.GET.get('operation')
 
-    input_cmd = format_input_sm(m, operation)
-    
+    input_cmd = format_input_sm(m)
     os.chdir("/home/elsie/calculator/matrix-calculator/calc-c++/")
 
     out = subprocess.Popen(input_cmd, stdout=subprocess.PIPE)

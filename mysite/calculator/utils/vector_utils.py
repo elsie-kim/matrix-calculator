@@ -1,3 +1,4 @@
+# cleans user input
 def clean_vector(v):
     v_split_2 = ""
 
@@ -14,7 +15,7 @@ def clean_vector(v):
 
     v = v[start:]
 
-    if v == "": #required?
+    if v == "": 
         is_valid = 0
          
             
@@ -30,30 +31,35 @@ def clean_vector(v):
             x = i.split(',')
 
             for j in x:
-                try:
-                    #finding non-numerical characters
-                    j = int(j)
+                if "." not in j:
+                    try:
+                        #finding non-numerical characters
+                        j = int(j)
 
-                    # add to new string which holds the "cleaned" input
-                    v_split_2 += str(j) + " "
+                        # add to new string which holds the "cleaned" input
+                        v_split_2 += str(j) + " "
 
-                except:
-                    if j != "":
-                        if "/" in j:
-                            index_slash = j.find("/")
+                    except:
+                        if j != "":
+                            if "/" in j:
+                                index_slash = j.find("/")
 
-                            try:
-                                a = int(j[0:index_slash])
-                                b = int(j[index_slash+1:])
+                                try:
+                                    a = int(j[0:index_slash])
+                                    b = int(j[index_slash+1:])
 
-                                v_split_2 += str(a) + "/" + str(b) + " "
+                                    v_split_2 += str(a) + "/" + str(b) + " "
 
-                            except:
-                                is_valid = 0
-                                v_split_2 = ""
-                                break
+                                except:
+                                    is_valid = 0
+                                    v_split_2 = ""
+                                    break
                 
-                        
+                else:
+                    is_valid = 0
+                    v_split_2 = ""
+                    break
+
     else:
         v_split_2 = ""
 
@@ -82,65 +88,13 @@ def validate_vector_v(v1, v2, operation):
             message = format_msg[0]
             is_valid = format_msg[1]
 
+    elif "." in v1 or "." in v2:
+        is_valid = 0
+        message = "Decimal values are not valid. Please use integer and/or fraction (i.e. -3/5) values."
+
     else:
         is_valid = 0
         message = "Invalid input"
-
-
-
-
-#    # removing any white space at the beginning
-#    start = 0
-#    for i in v:
-#        if i == " ":
-#            start += 1
-#        else:
-#            break
-#    
-#    v = v[start:]
-#    
-#    # return empty list to indicate empty input
-#    if v == "":
-#        message = ""
-#
-#    elif v[0] == '(' and v[-1] == ')':
-#        # remove parentheses
-#        v_split = v[1:-1]
-#       
-#        # remove spaces
-#        v_split = v_split.split(' ')
-#        v_split_2 = "" 
-#        
-#        # remove commas and any non-numerical characters
-#        for i in v_split:
-#            x = i.split(',')
-#        
-#            for j in x:
-#                try:
-#                    # finding non-numerical characters
-#                    j = int(j)
-#    
-#                    # add to new string which holds the "cleaned" input
-#                    v_split_2 += str(j) + " "
-#            
-#                except:
-#                    if j != "":
-#                        if "/" in j:
-#                            int index_slash = find("/")
-#
-#                            try:
-#                                a = int(j[index_slash])
-#                                b = int(j[index_slash+1:])
-#
-#                            except:
-#                                message = "Invalid characters" # Cant include message, but need a way to implement messages, is_valid
-#                        
-#                        message = "Invalid characters"
-#                   
-#                    
-#
-#        # return list of components
-#        return v_split_2 
 
     data = {
         'is_valid': str(is_valid),
@@ -181,6 +135,7 @@ def format_output_v(answer):
 
     return answer
 
+# formats error message if applicable
 def format_message_v(v1_clean, v2_clean, operation):
     if v1_clean != "" and v2_clean != "" and len(v1_clean.split(" ")) == len(v2_clean.split(" ")):
         if operation == "1":

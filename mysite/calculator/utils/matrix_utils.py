@@ -1,7 +1,9 @@
+# clean up and validate user input
 def validate_matrix_m(m1, m2, operation):
     m1_clean = ""
     m2_clean = ""
-
+    
+    # removing whitespace
     m1_split = m1.splitlines()
     m1_split = [i for i in m1_split if i != "" and i != " "]
 
@@ -50,44 +52,18 @@ def validate_matrix_m(m1, m2, operation):
                 is_valid = 1
 
 
+        # format user input (Ex. -n 1 2 3 -n 4 5 6 -n 7 8 9)
         if is_valid == 1:
             for i in m1_split:
                 m1_clean += "-n "
                 for j in i:
-                    try:
-                        j = int(j)
 
-                        m1_clean += str(j) + " "
-
-                    except:
-                        if "/" in j:
-                            index_slash = j.find("/")
-
-                            try:
-                                m = int(j[0:index_slash])
-                                n = int(j[index_slash+1:])
-
-                                m1_clean += str(m) + "/" + str(n) + " "
-
-                                is_valid = 1
-
-                            except:
-                                is_valid = 0
-                                message = "Invalid characters"
-                                break
-                        else:
-                            is_valid = 0
-                            message = "Invalid characters"
-                            break
-
-        if is_valid == 1:  
-               for i in m2_split:
-                    m2_clean += "-n "
-                    for j in i:
+                    if "." not in j:
+                        # filtering out non-numerical characters (unless it is a fraction)
                         try:
                             j = int(j)
 
-                            m2_clean += str(j) + " "
+                            m1_clean += str(j) + " "
 
                         except:
                             if "/" in j:
@@ -97,7 +73,7 @@ def validate_matrix_m(m1, m2, operation):
                                     m = int(j[0:index_slash])
                                     n = int(j[index_slash+1:])
 
-                                    m2_clean += str(m) + "/" + str(n) + " "
+                                    m1_clean += str(m) + "/" + str(n) + " "
 
                                     is_valid = 1
 
@@ -110,7 +86,50 @@ def validate_matrix_m(m1, m2, operation):
                                 message = "Invalid characters"
                                 break
 
+                    # filtering out decimals (program only takes in integers and fractions)
+                    else:
+                        is_valid = 0
+                        message = "Demical values are not valid. Please use integer and/or fraction (i.e. -3/5) values."
+                        break
 
+
+        if is_valid == 1:  
+               for i in m2_split:
+                    m2_clean += "-n "
+                    for j in i:
+                        if "." not in j:
+                            try:
+                                j = int(j)
+
+                                m2_clean += str(j) + " "
+
+                            except:
+                                if "/" in j:
+                                    index_slash = j.find("/")
+
+                                    try:
+                                        m = int(j[0:index_slash])
+                                        n = int(j[index_slash+1:])
+
+                                        m2_clean += str(m) + "/" + str(n) + " "
+
+                                        is_valid = 1
+
+                                    except:
+                                        is_valid = 0
+                                        message = "Invalid characters"
+                                        break
+                                else:
+                                    is_valid = 0
+                                    message = "Invalid characters"
+                                    break
+
+                        else:
+                            is_valid = 0
+                            message = "Decimal values are not valid. Please use integer and/or fraction (i.e. -3/5) values."
+                            break
+
+    
     data = {
         'is_valid': str(is_valid),
         'm1': m1_clean,
@@ -120,112 +139,8 @@ def validate_matrix_m(m1, m2, operation):
     }
 
     return data
-                
-#
-#
-#    # split lines into individual components
-#    # and add "-n" to indicate a new line, so that main.cpp
-#    # can process the string and split into 2D vectors
-#    for i in range(len(m1_split)-1):
-#        x = m1_split[i].split()
-#        y = m1_split[i+1].split()
-#        
-#        q = m2_split[i].split()
-#        r = m2_split[i].split()
-#
-#        a = [i.strip(" ") for i in x]
-#        b = [i.strip(" ") for i in y]
-#
-#        # for matrix A of dimensions (m x n) and matrix B of dimensions (p x q),
-#        # n must be equal to p in order for multiplication to be a valid
-#        # operation
-#        if operation == "0":
-#            if (len(a) != len(b) or len(q) != len(r) or len(m2_split) != len(b)):            
-#                is_valid = 0
-#                message = "The number of columns of matrix 1 must match the number of rows of matrix 2"
-#                break
-#            else:
-#                is_valid = 1
-#
-#        # check that each row is of equal length
-#        elif not (len(a) == len(b) == len(q) == len(r)):
-#            is_valid = 0
-#            if not (len(m1_split) == len(m2_split)): 
-#                message = "All rows must be equal in dimension, and all columns must be equal in dimension"
-#            else:
-#                message = "Rows must be equal in dimension"
-#            break
-#        
-#        elif not (len(m1_split) == len(m2_split)): # something like that
-#            is_valid = 0
-#            message = "Matrices must be of equal dimensions"
-#            break
-#
-#        else:
-#            is_valid = 1
-#    
-#    if is_valid == 1: #need if statement?
-#        for i in m1_split:
-#            m1_clean += "-n "
-#
-#            for j in i.split(" "):
-#                try:
-#                    j = int(j)
-#
-#                    m1_clean += str(j) + " "
-#            
-#                except:
-#                    if j != " " or j != "":
-#                        is_valid = 0
-#
-#                        if "/" in j:
-#                            index_slash = j.find("/")
-#                        
-#                            try:
-#                                m = int(j[0:index_slash])
-#                                n = int(j[index_slash+1:])
-#                                
-#                                m1_clean += str(m) + "/" + str(n) + " "
-#
-#                                is_valid = 1
-#
-#                            except: #break?
-#                                message = "Invalid characters"   
-#                        
-#                        else:
-#                            message = "Invalid characters"
-#
-#          
-#        for i in m2_split:
-#            m2_clean += "-n "
-#
-#            for j in i.split(" "):
-#                try:
-#                    j = int(j)
-#
-#                    m2_clean += str(j) + " "
-#
-#                except:
-#                    if j != " " or j != "":
-#                        is_valid = 0
-#
-#                        if "/" in j:
-#                            index_slash = j.find("/")
-#
-#                            try:
-#                                m = int(j[0:index_slash])
-#                                n = int(j[index_slash+1:])
-#                                
-#                                m2_clean += str(m) + "/" + str(n) + " "
-#
-#                                is_valid = 1
-#
-#                            except:
-#                                message = "Invalid characters"
-#
-#                        else:
-#                            message = "Invalid characters"
 
+# formats user input (Ex. ./a.out -m 2 -m1 -n 1 2 3 -n 4 5 6 -m2 -n 1 2 3 -n 4 5 6)
 def format_input_m(m1, m2, operation):
     input_cmd = ['./a.out', '-m', operation, '-m1']
 
@@ -241,6 +156,7 @@ def format_input_m(m1, m2, operation):
 
     return input_cmd
 
+# formats c++ output (answer)
 def format_output_m(output):
     answer = ""
 

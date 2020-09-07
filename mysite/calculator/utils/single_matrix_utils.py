@@ -1,4 +1,5 @@
-def validate_matrix_sm(m, operation):
+# cleans and validates user input
+def validate_matrix_sm(m):
     m_clean = ""
 
     m_split = m.splitlines()
@@ -29,44 +30,50 @@ def validate_matrix_sm(m, operation):
             m_clean += "-n "
 
             for j in i:
-                try:
-                    j = int(j)
+                if "." not in j:
+                    try:
+                        j = int(j)
+                        
+                        m_clean += str(j) + " "
 
-                    m_clean += str(j) + " "
+                    except:
+                        if "/" in j:
+                            index_slash = j.find("/")
+                               
+                            try:
+                                m = int(j[0:index_slash])
+                                n = int(j[index_slash+1:])
 
-                except:
-                    if "/" in j:
-                        index_slash = j.find("/")
-                           
-                        try:
-                            m = int(j[0:index_slash])
-                            n = int(j[index_slash+1:])
+                                m_clean += str(m) + "/" + str(n) + " "
 
-                            m_clean += str(m) + "/" + str(n) + " "
+                                is_valid = 1   
 
-                            is_valid = 1   
+                            except:
+                                is_valid = 0
+                                message = "Invalid characters"
+                                break
 
-                        except:
+                        else:
                             is_valid = 0
                             message = "Invalid characters"
                             break
-
-                    else:
-                        is_valid = 0
-                        message = "Invalid characters"
-                        break
+            
+                else:
+                    is_valid = 0
+                    message = "Decimal values are not valid. Please use integer and/or fraction (i.e. -3/5) values."
+                    break
 
     data = {
         'is_valid': is_valid,
         'm': m_clean,
-        'operation': operation,
         'message': message,
     }
 
     return data
 
-def format_input_sm(m, operation):
-    input_cmd = ['./a.out', '-m', operation]
+# formats user input (Ex. ./a.out -m 3 -n 1 2 3 -n 4 5 6)
+def format_input_sm(m):
+    input_cmd = ['./a.out', '-m', "3"]
     
     for i in m.split(" "):
         if i != "":
@@ -74,6 +81,7 @@ def format_input_sm(m, operation):
 
     return input_cmd
 
+# formats ouput from c++ file (answer)
 def format_output_sm(output):
     answer = ""
 
